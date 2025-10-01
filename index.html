@@ -104,15 +104,17 @@
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: #333;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), inset 0 -2px 5px rgba(0, 0, 0, 0.1);
         }
 
         .btn-numero:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
 
         .btn-numero:active {
-            transform: translateY(0);
+            transform: translateY(1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .btn-punto {
@@ -140,21 +142,31 @@
             cursor: pointer;
             transition: all 0.3s ease;
             color: white;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2), inset 0 -2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .boton:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 -2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .boton:active {
-            transform: translateY(0);
+            transform: translateY(1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
         .suma { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
         .resta { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
         .multiplicar { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
         .dividir { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .calcular { 
+            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+            box-shadow: 0 6px 15px rgba(0, 114, 255, 0.4), inset 0 -3px 10px rgba(0, 0, 0, 0.2);
+            font-size: 18px;
+        }
+        .calcular:hover {
+            box-shadow: 0 10px 25px rgba(0, 114, 255, 0.5), inset 0 -3px 10px rgba(0, 0, 0, 0.2);
+        }
         .limpiar { background: linear-gradient(135deg, #a8a8a8 0%, #7f7f7f 100%); }
 
         .seccion {
@@ -186,11 +198,17 @@
             cursor: pointer;
             transition: all 0.3s ease;
             color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), inset 0 -2px 6px rgba(0, 0, 0, 0.15);
         }
 
         .boton-avanzado:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 18px rgba(0, 0, 0, 0.3), inset 0 -2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .boton-avanzado:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
         .modulo { background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); }
@@ -390,6 +408,9 @@
                 <button class="boton dividir" onclick="setOperacion('dividir')">÷ Dividir</button>
             </div>
 
+            <button class="boton calcular" onclick="calcular()" style="width: 100%; margin-bottom: 10px;">
+                ✓ Calcular / Enter
+            </button>
             <button class="boton limpiar" onclick="limpiar()" style="width: 100%;">Limpiar Todo</button>
 
             <div class="seccion">
