@@ -83,10 +83,6 @@
             padding: 8px 12px;
         }
 
-        #langSelector option {
-            padding: 10px;
-        }
-
         .control-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 15px var(--shadow-color);
@@ -355,6 +351,12 @@
         .redondeo { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
         .pi { background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%); }
         .euler { background: linear-gradient(135deg, #868f96 0%, #596164 100%); }
+        .exponencial { background: linear-gradient(135deg, #fccb90 0%, #d57eeb 100%); }
+        .porcentaje { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); }
+        .deg-rad { background: linear-gradient(135deg, #fa8bff 0%, #2bd2ff 90%); }
+        .rad-deg { background: linear-gradient(135deg, #2bd2ff 0%, #fa8bff 90%); }
+        .ceil { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
+        .floor { background: linear-gradient(135deg, #fda085 0%, #f6d365 100%); }
 
         .grafica-header {
             margin-bottom: 20px;
@@ -421,30 +423,45 @@
         }
 
         .ejemplos {
-            font-size: 12px;
+            font-size: 14px;
             color: var(--text-secondary);
             margin-top: 10px;
             transition: color 0.3s ease;
         }
 
+        .ejemplos strong {
+            font-size: 15px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
         .ejemplo-item {
             display: inline-block;
-            margin: 4px 2px;
+            margin: 6px 8px;
+            text-align: center;
+            vertical-align: top;
         }
 
         .ejemplo-titulo {
-            font-size: 10px;
-            color: var(--color-accent);
+            font-size: 11px;
+            color: var(--text-secondary);
             font-weight: 600;
             display: block;
-            margin-bottom: 2px;
-            transition: color 0.3s ease;
+            margin-bottom: 6px;
+            opacity: 0.75;
+            transition: color 0.3s ease, opacity 0.3s ease;
+            white-space: nowrap;
         }
 
-        .ejemplos span {
-            display: inline-block;
+        .ejemplo-item:hover .ejemplo-titulo {
+            opacity: 1;
+            color: var(--color-accent);
+        }
+
+        .ejemplos span:not(.ejemplo-titulo) {
+            display: block;
             background: var(--historial-bg);
-            padding: 6px 10px;
+            padding: 8px 12px;
             border-radius: 5px;
             cursor: pointer;
             transition: all 0.3s;
@@ -452,7 +469,7 @@
             color: var(--text-primary);
         }
 
-        .ejemplos span:hover {
+        .ejemplos span:not(.ejemplo-titulo):hover {
             background: var(--color-accent);
             color: white;
             transform: translateY(-2px);
@@ -538,9 +555,6 @@
         <select class="control-btn" id="langSelector">
             <option value="es">🇪🇸 ESP</option>
             <option value="en">🇬🇧 ENG</option>
-            <option value="de">🇩🇪 DEU</option>
-            <option value="fr">🇫🇷 FRA</option>
-            <option value="it">🇮🇹 ITA</option>
         </select>
     </div>
 
@@ -578,6 +592,7 @@
                 ✓ <span data-lang="calculate">Calcular / Enter</span>
             </button>
             <button class="boton limpiar" onclick="limpiar()" style="width: 100%;" data-lang="clear">Limpiar Todo</button>
+            
             <div class="seccion">
                 <div class="seccion-titulo">⚡ <span data-lang="advanced">OPERACIONES AVANZADAS</span>:</div>
                 <div class="botones-avanzados">
@@ -588,8 +603,11 @@
                     <button class="boton-avanzado logaritmo" onclick="operacionUnaria('log10')" data-lang="log">Logaritmo (base 10)</button>
                     <button class="boton-avanzado ln" onclick="operacionUnaria('ln')" data-lang="ln">Logaritmo natural (ln)</button>
                     <button class="boton-avanzado log-custom" onclick="setOperacion('logCustom')" data-lang="logcustom">Log (base personalizada)</button>
+                    <button class="boton-avanzado exponencial" onclick="operacionUnaria('exponencial')" data-lang="exp">Exponencial (e^x)</button>
+                    <button class="boton-avanzado porcentaje" onclick="setOperacion('porcentaje')" data-lang="percent">Porcentaje (%)</button>
                 </div>
             </div>
+
             <div class="seccion">
                 <div class="seccion-titulo">📐 <span data-lang="trig">FUNCIONES TRIGONOMÉTRICAS</span>:</div>
                 <div class="botones-avanzados">
@@ -599,16 +617,22 @@
                     <button class="boton-avanzado arcoseno" onclick="operacionUnaria('arcoseno')" data-lang="asin">Arcoseno</button>
                     <button class="boton-avanzado arcocoseno" onclick="operacionUnaria('arcocoseno')" data-lang="acos">Arcocoseno</button>
                     <button class="boton-avanzado arcotangente" onclick="operacionUnaria('arcotangente')" data-lang="atan">Arcotangente</button>
+                    <button class="boton-avanzado deg-rad" onclick="operacionUnaria('degArad')" data-lang="deg-rad">Grados → Radianes</button>
+                    <button class="boton-avanzado rad-deg" onclick="operacionUnaria('radAdeg')" data-lang="rad-deg">Radianes → Grados</button>
                 </div>
             </div>
+
             <div class="seccion">
                 <div class="seccion-titulo">🎯 <span data-lang="other">OTRAS FUNCIONES</span>:</div>
                 <div class="botones-avanzados">
                     <button class="boton-avanzado factorial" onclick="operacionUnaria('factorial')" data-lang="factorial">Factorial</button>
                     <button class="boton-avanzado absoluto" onclick="operacionUnaria('absoluto')" data-lang="abs">Valor absoluto</button>
                     <button class="boton-avanzado redondeo" onclick="operacionUnaria('redondeo')" data-lang="round">Redondeo</button>
+                    <button class="boton-avanzado ceil" onclick="operacionUnaria('ceil')" data-lang="ceil">Redondeo arriba</button>
+                    <button class="boton-avanzado floor" onclick="operacionUnaria('floor')" data-lang="floor">Redondeo abajo</button>
                 </div>
             </div>
+
             <div class="seccion">
                 <div class="seccion-titulo">⭐ <span data-lang="constants">CONSTANTES</span>:</div>
                 <div class="botones-avanzados">
@@ -616,6 +640,7 @@
                     <button class="boton-avanzado euler" onclick="insertarConstante('e')" data-lang="euler">Mostrar e (Euler)</button>
                 </div>
             </div>
+
             <div class="historial">
                 <div class="historial-titulo">📝 <span data-lang="history">Historial</span></div>
                 <div id="historial"></div>
@@ -625,6 +650,7 @@
                 Créditos: @losmonosco
             </div>
         </div>
+        
         <div class="grafica-panel">
             <div class="grafica-header">
                 <h2>📊 <span data-lang="graph-title">Visualización Gráfica</span></h2>
@@ -658,6 +684,14 @@
                         <span class="ejemplo-titulo" data-lang="exponential">Exponencial</span>
                         <span onclick="graficarEjemplo('exp(x)')">eˣ</span>
                     </div>
+                    <div class="ejemplo-item">
+                        <span class="ejemplo-titulo" data-lang="sine">Seno</span>
+                        <span onclick="graficarEjemplo('sin(x)')">sin(x)</span>
+                    </div>
+                    <div class="ejemplo-item">
+                        <span class="ejemplo-titulo" data-lang="cosine">Coseno</span>
+                        <span onclick="graficarEjemplo('cos(x)')">cos(x)</span>
+                    </div>
                 </div>
             </div>
             <div class="canvas-container">
@@ -665,8 +699,8 @@
             </div>
         </div>
     </div>
+    
     <script>
-        // Sistema de traducción
         const translations = {
             es: {
                 'theme': '🌙 Modo Oscuro',
@@ -687,6 +721,8 @@
                 'log': 'Logaritmo (base 10)',
                 'ln': 'Logaritmo natural (ln)',
                 'logcustom': 'Log (base personalizada)',
+                'exp': 'Exponencial (e^x)',
+                'percent': 'Porcentaje (%)',
                 'trig': 'FUNCIONES TRIGONOMÉTRICAS',
                 'sin': 'Seno',
                 'cos': 'Coseno',
@@ -694,10 +730,14 @@
                 'asin': 'Arcoseno',
                 'acos': 'Arcocoseno',
                 'atan': 'Arcotangente',
+                'deg-rad': 'Grados → Radianes',
+                'rad-deg': 'Radianes → Grados',
                 'other': 'OTRAS FUNCIONES',
                 'factorial': 'Factorial',
                 'abs': 'Valor absoluto',
                 'round': 'Redondeo',
+                'ceil': 'Redondeo arriba',
+                'floor': 'Redondeo abajo',
                 'constants': 'CONSTANTES',
                 'pi': 'Mostrar π (pi)',
                 'euler': 'Mostrar e (Euler)',
@@ -707,8 +747,8 @@
                 'graph-placeholder': 'Escribe tu función, ej: sin(x), x^2, log(x)',
                 'graph-btn': 'Graficar',
                 'examples': 'Ejemplos de funciones:',
-                'sine': 'Función Seno',
-                'cosine': 'Función Coseno',
+                'sine': 'Seno',
+                'cosine': 'Coseno',
                 'parabola': 'Parábola',
                 'cubic': 'Cúbica',
                 'logarithm': 'Logaritmo',
@@ -747,6 +787,8 @@
                 'log': 'Logarithm (base 10)',
                 'ln': 'Natural logarithm (ln)',
                 'logcustom': 'Log (custom base)',
+                'exp': 'Exponential (e^x)',
+                'percent': 'Percentage (%)',
                 'trig': 'TRIGONOMETRIC FUNCTIONS',
                 'sin': 'Sine',
                 'cos': 'Cosine',
@@ -754,10 +796,14 @@
                 'asin': 'Arcsine',
                 'acos': 'Arccosine',
                 'atan': 'Arctangent',
+                'deg-rad': 'Degrees → Radians',
+                'rad-deg': 'Radians → Degrees',
                 'other': 'OTHER FUNCTIONS',
                 'factorial': 'Factorial',
                 'abs': 'Absolute value',
                 'round': 'Rounding',
+                'ceil': 'Round up',
+                'floor': 'Round down',
                 'constants': 'CONSTANTS',
                 'pi': 'Show π (pi)',
                 'euler': 'Show e (Euler)',
@@ -767,8 +813,8 @@
                 'graph-placeholder': 'Write your function, e.g.: sin(x), x^2, log(x)',
                 'graph-btn': 'Graph',
                 'examples': 'Function examples:',
-                'sine': 'Sine Function',
-                'cosine': 'Cosine Function',
+                'sine': 'Sine',
+                'cosine': 'Cosine',
                 'parabola': 'Parabola',
                 'cubic': 'Cubic',
                 'logarithm': 'Logarithm',
@@ -787,186 +833,6 @@
                 'error-invalid-root': 'Invalid root degree',
                 'error-function': 'Please write a function',
                 'error-graph': 'Error graphing the function'
-            },
-            de: {
-                'theme': '🌙 Dunkelmodus',
-                'theme-light': '☀️ Hellmodus',
-                'calc-title': 'Taschenrechner',
-                'calc-subtitle': 'Einfach und elegant',
-                'add': 'Addition',
-                'subtract': 'Subtraktion',
-                'multiply': 'Multiplizieren',
-                'divide': 'Dividieren',
-                'calculate': 'Berechnen / Enter',
-                'clear': 'Alles löschen',
-                'advanced': 'ERWEITERTE OPERATIONEN',
-                'modulo': 'Modulo (Rest)',
-                'power': 'Potenz (a^b)',
-                'sqrt': 'Quadratwurzel',
-                'nroot': 'N-te Wurzel',
-                'log': 'Logarithmus (Basis 10)',
-                'ln': 'Natürlicher Logarithmus (ln)',
-                'logcustom': 'Log (benutzerdefinierte Basis)',
-                'trig': 'TRIGONOMETRISCHE FUNKTIONEN',
-                'sin': 'Sinus',
-                'cos': 'Kosinus',
-                'tan': 'Tangens',
-                'asin': 'Arkussinus',
-                'acos': 'Arkuskosinus',
-                'atan': 'Arkustangens',
-                'other': 'ANDERE FUNKTIONEN',
-                'factorial': 'Fakultät',
-                'abs': 'Absolutwert',
-                'round': 'Runden',
-                'constants': 'KONSTANTEN',
-                'pi': 'Zeige π (pi)',
-                'euler': 'Zeige e (Euler)',
-                'history': 'Verlauf',
-                'footer': '📱 ❤️ Mit Liebe gemacht von Pepe Gamboa',
-                'graph-title': 'Grafische Darstellung',
-                'graph-placeholder': 'Schreiben Sie Ihre Funktion, z.B.: sin(x), x^2, log(x)',
-                'graph-btn': 'Grafik',
-                'examples': 'Funktionsbeispiele:',
-                'sine': 'Sinusfunktion',
-                'cosine': 'Kosinusfunktion',
-                'parabola': 'Parabel',
-                'cubic': 'Kubisch',
-                'logarithm': 'Logarithmus',
-                'square-root': 'Quadratwurzel',
-                'absolute': 'Absolutwert',
-                'exponential': 'Exponential',
-                'error-number': 'Bitte geben Sie zuerst eine gültige Zahl ein',
-                'error-divide-zero': 'Division durch Null nicht möglich',
-                'error-log-positive': 'Logarithmus nur für positive Zahlen',
-                'error-sqrt-negative': 'Quadratwurzel negativer Zahlen nicht möglich',
-                'error-arcsin': 'Arkussinus erfordert Wert zwischen -1 und 1',
-                'error-arccos': 'Arkuskosinus erfordert Wert zwischen -1 und 1',
-                'error-factorial': 'Fakultät nur für positive ganze Zahlen',
-                'error-factorial-large': 'Zahl zu groß für Fakultät',
-                'prompt-root-degree': 'Wurzel welchen Grades?',
-                'error-invalid-root': 'Ungültiger Wurzelgrad',
-                'error-function': 'Bitte schreiben Sie eine Funktion',
-                'error-graph': 'Fehler beim Grafieren der Funktion'
-            },
-            fr: {
-                'theme': '🌙 Mode Sombre',
-                'theme-light': '☀️ Mode Clair',
-                'calc-title': 'Calculatrice',
-                'calc-subtitle': 'Simple et élégante',
-                'add': 'Addition',
-                'subtract': 'Soustraction',
-                'multiply': 'Multiplier',
-                'divide': 'Diviser',
-                'calculate': 'Calculer / Enter',
-                'clear': 'Tout effacer',
-                'advanced': 'OPÉRATIONS AVANCÉES',
-                'modulo': 'Modulo (reste)',
-                'power': 'Puissance (a^b)',
-                'sqrt': 'Racine carrée',
-                'nroot': 'Racine n-ième',
-                'log': 'Logarithme (base 10)',
-                'ln': 'Logarithme naturel (ln)',
-                'logcustom': 'Log (base personnalisée)',
-                'trig': 'FONCTIONS TRIGONOMÉTRIQUES',
-                'sin': 'Sinus',
-                'cos': 'Cosinus',
-                'tan': 'Tangente',
-                'asin': 'Arc sinus',
-                'acos': 'Arc cosinus',
-                'atan': 'Arc tangente',
-                'other': 'AUTRES FONCTIONS',
-                'factorial': 'Factorielle',
-                'abs': 'Valeur absolue',
-                'round': 'Arrondi',
-                'constants': 'CONSTANTES',
-                'pi': 'Afficher π (pi)',
-                'euler': 'Afficher e (Euler)',
-                'history': 'Historique',
-                'footer': '📱 ❤️ Fait avec amour par Pepe Gamboa',
-                'graph-title': 'Visualisation Graphique',
-                'graph-placeholder': 'Écrivez votre fonction, ex: sin(x), x^2, log(x)',
-                'graph-btn': 'Graphique',
-                'examples': 'Exemples de fonctions:',
-                'sine': 'Fonction Sinus',
-                'cosine': 'Fonction Cosinus',
-                'parabola': 'Parabole',
-                'cubic': 'Cubique',
-                'logarithm': 'Logarithme',
-                'square-root': 'Racine Carrée',
-                'absolute': 'Valeur Absolue',
-                'exponential': 'Exponentielle',
-                'error-number': 'Veuillez entrer un nombre valide d\'abord',
-                'error-divide-zero': 'Impossible de diviser par zéro',
-                'error-log-positive': 'Logarithme uniquement pour les nombres positifs',
-                'error-sqrt-negative': 'Impossible de calculer la racine carrée d\'un nombre négatif',
-                'error-arcsin': 'Arc sinus nécessite une valeur entre -1 et 1',
-                'error-arccos': 'Arc cosinus nécessite une valeur entre -1 et 1',
-                'error-factorial': 'Factorielle uniquement pour les entiers positifs',
-                'error-factorial-large': 'Nombre trop grand pour la factorielle',
-                'prompt-root-degree': 'Racine de quel degré?',
-                'error-invalid-root': 'Degré de racine invalide',
-                'error-function': 'Veuillez écrire une fonction',
-                'error-graph': 'Erreur lors du traçage de la fonction'
-            },
-            it: {
-                'theme': '🌙 Modalità Scura',
-                'theme-light': '☀️ Modalità Chiara',
-                'calc-title': 'Calcolatrice',
-                'calc-subtitle': 'Semplice ed elegante',
-                'add': 'Addizione',
-                'subtract': 'Sottrazione',
-                'multiply': 'Moltiplicare',
-                'divide': 'Dividere',
-                'calculate': 'Calcola / Enter',
-                'clear': 'Cancella tutto',
-                'advanced': 'OPERAZIONI AVANZATE',
-                'modulo': 'Modulo (resto)',
-                'power': 'Potenza (a^b)',
-                'sqrt': 'Radice quadrata',
-                'nroot': 'Radice n-esima',
-                'log': 'Logaritmo (base 10)',
-                'ln': 'Logaritmo naturale (ln)',
-                'logcustom': 'Log (base personalizzata)',
-                'trig': 'FUNZIONI TRIGONOMETRICHE',
-                'sin': 'Seno',
-                'cos': 'Coseno',
-                'tan': 'Tangente',
-                'asin': 'Arcoseno',
-                'acos': 'Arcocoseno',
-                'atan': 'Arcotangente',
-                'other': 'ALTRE FUNZIONI',
-                'factorial': 'Fattoriale',
-                'abs': 'Valore assoluto',
-                'round': 'Arrotondamento',
-                'constants': 'COSTANTI',
-                'pi': 'Mostra π (pi)',
-                'euler': 'Mostra e (Euler)',
-                'history': 'Cronologia',
-                'footer': '📱 ❤️ Fatto con amore da Pepe Gamboa',
-                'graph-title': 'Visualizzazione Grafica',
-                'graph-placeholder': 'Scrivi la tua funzione, es: sin(x), x^2, log(x)',
-                'graph-btn': 'Grafico',
-                'examples': 'Esempi di funzioni:',
-                'sine': 'Funzione Seno',
-                'cosine': 'Funzione Coseno',
-                'parabola': 'Parabola',
-                'cubic': 'Cubica',
-                'logarithm': 'Logaritmo',
-                'square-root': 'Radice Quadrata',
-                'absolute': 'Valore Assoluto',
-                'exponential': 'Esponenziale',
-                'error-number': 'Inserisci prima un numero valido',
-                'error-divide-zero': 'Impossibile dividere per zero',
-                'error-log-positive': 'Logaritmo solo per numeri positivi',
-                'error-sqrt-negative': 'Impossibile calcolare la radice quadrata di un numero negativo',
-                'error-arcsin': 'Arcoseno richiede un valore tra -1 e 1',
-                'error-arccos': 'Arcocoseno richiede un valore tra -1 e 1',
-                'error-factorial': 'Fattoriale solo per interi positivi',
-                'error-factorial-large': 'Numero troppo grande per il fattoriale',
-                'prompt-root-degree': 'Radice di che grado?',
-                'error-invalid-root': 'Grado di radice non valido',
-                'error-function': 'Scrivi una funzione',
-                'error-graph': 'Errore nel tracciare la funzione'
             }
         };
 
@@ -998,30 +864,19 @@
             });
         }
 
-        // Toggle tema
         document.getElementById('themeToggle').addEventListener('click', function() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
             updateLanguage();
         });
 
-        // Cambio de idioma
         document.getElementById('langSelector').addEventListener('change', function(e) {
             currentLang = e.target.value;
-            localStorage.setItem('lang', currentLang);
             updateLanguage();
         });
 
-        // Cargar preferencias guardadas
         window.addEventListener('DOMContentLoaded', function() {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            const savedLang = localStorage.getItem('lang') || 'es';
-            
-            document.documentElement.setAttribute('data-theme', savedTheme);
-            currentLang = savedLang;
-            document.getElementById('langSelector').value = savedLang;
             updateLanguage();
         });
 
@@ -1035,7 +890,8 @@
                     'dividir': '÷',
                     'potencia': '^',
                     'modulo': 'mod',
-                    'logCustom': 'log'
+                    'logCustom': 'log',
+                    'porcentaje': '%'
                 }[operacion] || '';
                 document.getElementById('operacionActual').textContent = `${primerNumero} ${simbolo}`;
             } else {
@@ -1120,6 +976,10 @@
                         resultado = Math.log(primerNumero) / Math.log(segundoNumero);
                         operacionTexto = `log${segundoNumero}(${primerNumero})`;
                         break;
+                    case 'porcentaje':
+                        resultado = (primerNumero * segundoNumero) / 100;
+                        operacionTexto = `${segundoNumero}% de ${primerNumero}`;
+                        break;
                 }
                 valorActual = resultado.toFixed(10).replace(/\.?0+$/, '');
                 agregarHistorial(`${operacionTexto} = ${valorActual}`);
@@ -1166,6 +1026,10 @@
                         resultado = Math.log(numero);
                         operacionTexto = `ln(${numero})`;
                         break;
+                    case 'exponencial':
+                        resultado = Math.exp(numero);
+                        operacionTexto = `e^${numero}`;
+                        break;
                     case 'seno':
                         resultado = Math.sin(numero);
                         operacionTexto = `sin(${numero})`;
@@ -1192,6 +1056,14 @@
                         resultado = Math.atan(numero);
                         operacionTexto = `arctan(${numero})`;
                         break;
+                    case 'degArad':
+                        resultado = numero * (Math.PI / 180);
+                        operacionTexto = `${numero}° → rad`;
+                        break;
+                    case 'radAdeg':
+                        resultado = numero * (180 / Math.PI);
+                        operacionTexto = `${numero} rad → °`;
+                        break;
                     case 'factorial':
                         if (numero < 0 || numero % 1 !== 0) throw new Error(translate('error-factorial'));
                         if (numero > 170) throw new Error(translate('error-factorial-large'));
@@ -1205,6 +1077,14 @@
                     case 'redondeo':
                         resultado = Math.round(numero);
                         operacionTexto = `round(${numero})`;
+                        break;
+                    case 'ceil':
+                        resultado = Math.ceil(numero);
+                        operacionTexto = `ceil(${numero})`;
+                        break;
+                    case 'floor':
+                        resultado = Math.floor(numero);
+                        operacionTexto = `floor(${numero})`;
                         break;
                 }
                 valorActual = resultado.toFixed(10).replace(/\.?0+$/, '');
