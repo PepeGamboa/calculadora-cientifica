@@ -1,227 +1,783 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora Científica Multilenguaje</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calculadora Científica — Gráficas</title>
+
+  <!-- Dependencias -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
   <style>
-    /* === Estilos generales === */
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:'Segoe UI',Tahoma,Verdana,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      min-height:100vh;padding:20px;display:flex;justify-content:center;align-items:center;transition:all 0.3s;}
+    /* Variables temáticas */
     :root{
-      --bg: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      --bg: #f4f7fb;
       --panel-bg: #fff;
-      --text:#333;
+      --primary: #667eea;
+      --accent: linear-gradient(135deg,#667eea 0%, #764ba2 100%);
+      --muted: #666;
+      --shadow: 0 18px 40px rgba(0,0,0,0.12);
+      --btn-text: #fff;
+      --card-radius: 18px;
+      --display-gradient: linear-gradient(145deg,#667eea 0%, #764ba2 100%);
+      --display-color: #fff;
+      --input-border: #e0e0e0;
+      --chart-grid: rgba(0,0,0,0.06);
+      --btn-big-padding: 18px;
+      --btn-font-weight: 700;
     }
     body.dark{
-      --bg: linear-gradient(135deg,#1f1f1f 0%,#333 100%);
-      --panel-bg:#2a2a2a;
-      --text:#eee;
+      --bg: #0f1724;
+      --panel-bg: #0b1220;
+      --primary: #98a8ff;
+      --accent: linear-gradient(135deg,#2b2f5a 0%, #3b2b5a 100%);
+      --muted: #c0c8e8;
+      --shadow: 0 18px 40px rgba(0,0,0,0.6);
+      --btn-text: #fff;
+      --display-gradient: linear-gradient(145deg,#22283b 0%, #3b2b65 100%);
+      --display-color: #e7ecff;
+      --input-border: #1a2433;
+      --chart-grid: rgba(255,255,255,0.05);
     }
-    .container{display:grid;grid-template-columns:450px 1fr;gap:20px;max-width:1400px;width:100%;height:90vh;}
-    .calculadora-panel,.grafica-panel{background:var(--panel-bg);border-radius:20px;padding:30px;
-      box-shadow:0 20px 60px rgba(0,0,0,0.3);transition:all 0.3s;}
-    .calculadora-panel{overflow-y:auto;}
-    .grafica-panel{display:flex;flex-direction:column;}
-    .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;}
-    .header h1{color:#667eea;font-size:1.6em;}
-    .controls{display:flex;gap:10px;}
-    .selector,.modo{padding:6px 10px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer;}
-    body.dark .selector, body.dark .modo{background:#444;color:#eee;border-color:#666;}
-    .display{background:linear-gradient(145deg,#667eea 0%,#764ba2 100%);color:white;padding:20px;border-radius:20px;
-      margin-bottom:20px;min-height:80px;font-size:24px;text-align:right;position:relative;overflow:hidden;}
-    .operacion-actual{font-size:14px;opacity:0.8;margin-bottom:5px;}
-    .input-numeros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:15px;}
-    .btn-numero,.boton{padding:18px;border:none;border-radius:18px;font-weight:700;cursor:pointer;transition:all 0.2s;}
-    .btn-numero{font-size:20px;background:#e8ecf1;box-shadow:0 6px 15px rgba(0,0,0,0.2);}
-    .btn-borrar{background:linear-gradient(145deg,#ff7675,#d63031);color:white;}
-    .botones{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:15px;}
-    .boton{font-size:17px;color:white;}
-    .suma{background:linear-gradient(145deg,#11998e,#38ef7d);}
-    .resta{background:linear-gradient(145deg,#f093fb,#f5576c);}
-    .multiplicar{background:linear-gradient(145deg,#4facfe,#00f2fe);}
-    .dividir{background:linear-gradient(145deg,#fa709a,#fee140);}
-    .calcular{background:linear-gradient(145deg,#00c6ff,#0072ff);font-size:19px;width:100%;margin-bottom:10px;}
-    .limpiar{background:linear-gradient(145deg,#a8a8a8,#7f7f7f);width:100%;}
-    .historial{margin-top:15px;padding:15px;background:#f8f9fa;border-radius:10px;max-height:150px;overflow-y:auto;}
-    body.dark .historial{background:#444;}
-    .historial-titulo{font-size:12px;color:#667eea;font-weight:600;margin-bottom:8px;}
-    .historial-item{font-size:13px;padding:5px;border-bottom:1px solid #e0e0e0;}
-    body.dark .historial-item{border-color:#666;}
-    .grafica-header{margin-bottom:20px;}
-    .grafica-header h2{color:#667eea;font-size:1.5em;margin-bottom:10px;}
-    .input-funcion{display:flex;gap:10px;margin-bottom:15px;}
-    .input-funcion input{flex:1;padding:12px;border:2px solid #e0e0e0;border-radius:10px;font-size:16px;}
-    body.dark .input-funcion input{background:#333;border-color:#666;color:#eee;}
-    .boton-graficar{padding:12px 25px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:10px;font-weight:600;}
-    .canvas-container{flex:1;background:#f8f9fa;border-radius:15px;padding:20px;}
-    body.dark .canvas-container{background:#333;}
-    .footer{text-align:center;margin-top:20px;font-size:12px;color:#666;}
-    body.dark .footer{color:#aaa;}
-    @media(max-width:1200px){.container{grid-template-columns:1fr;height:auto;}.grafica-panel{min-height:500px;}}
+
+    html,body{height:100%;margin:0;font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+    body{background:var(--bg);padding:20px;display:flex;justify-content:center;align-items:flex-start;}
+
+    .container{
+      width:100%; max-width:1400px;
+      display:grid; grid-template-columns:420px 1fr; gap:20px;
+    }
+
+    .panel{
+      background:var(--panel-bg);
+      border-radius:20px;
+      padding:20px;
+      box-shadow:var(--shadow);
+      color:var(--muted);
+    }
+
+    /* Calculadora */
+    .left{overflow:auto; height:86vh;}
+    .header{display:flex;align-items:center;gap:12px}
+    .brand-title{font-size:28px;color:var(--primary);font-weight:800}
+    .header-controls{margin-left:auto;display:flex;gap:8px;align-items:center}
+
+    .display{
+      background:var(--display-gradient);
+      color:var(--display-color);
+      padding:18px;border-radius:14px;margin:18px 0;
+      min-height:68px;font-size:26px;text-align:right;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
+      position:relative;
+    }
+    .operacion-actual{position:absolute;left:16px;top:10px;font-size:12px;opacity:0.85}
+    #display{font-weight:700;letter-spacing:0.6px}
+
+    .input-numeros{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+    .btn-numero{padding:var(--btn-big-padding);border-radius:14px;border:none;background:linear-gradient(145deg,#fff 0%, #eef3f8 100%);box-shadow:0 10px 30px rgba(0,0,0,0.06);cursor:pointer;font-size:20px;font-weight:700;color:#111}
+    .btn-numero:active{transform:translateY(1px)}
+
+    .btn-punto{background:linear-gradient(145deg,#ffeb9a 0%, #fdc765 100%)}
+    .btn-borrar{background:linear-gradient(145deg,#ff7675 0%, #d63031 100%);color:#fff}
+
+    .botones{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px}
+    .boton{padding:var(--btn-big-padding);border-radius:12px;border:none;color:var(--btn-text);cursor:pointer;font-weight:var(--btn-font-weight)}
+    .suma{background:linear-gradient(145deg,#11998e 0%, #38ef7d 100%)}
+    .resta{background:linear-gradient(145deg,#f093fb 0%, #f5576c 100%)}
+    .multiplicar{background:linear-gradient(145deg,#4facfe 0%, #00f2fe 100%)}
+    .dividir{background:linear-gradient(145deg,#fa709a 0%, #fee140 100%)}
+
+    .calcular{background:linear-gradient(145deg,#00c6ff 0%, #0072ff 100%);width:100%;border-radius:14px;padding:14px;margin-bottom:8px;font-size:18px}
+    .limpiar{background:linear-gradient(145deg,#a8a8a8 0%, #7f7f7f 100%);width:100%;border-radius:14px;padding:12px;color:#fff}
+
+    .seccion{margin-top:14px}
+    .seccion-titulo{color:var(--primary);font-weight:700;margin-bottom:8px;font-size:13px}
+    .botones-avanzados{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+
+    .boton-avanzado{padding:12px;border-radius:12px;border:none;color:var(--btn-text);cursor:pointer;font-weight:700}
+
+    /* Historial */
+    .historial{margin-top:14px;background:transparent;border-radius:10px;padding:10px}
+    .historial-item{padding:8px;border-radius:8px;background:rgba(0,0,0,0.03);margin-bottom:6px;cursor:pointer;color:inherit}
+
+    /* Panel de gráficas */
+    .right{display:flex;flex-direction:column;height:86vh}
+    .grafica-header{display:flex;flex-direction:column;gap:12px;margin-bottom:10px}
+    .input-funcion{display:flex;gap:10px}
+    .input-funcion input{flex:1;padding:12px;border:2px solid var(--input-border);border-radius:10px;background:transparent;color:inherit}
+    .boton-graficar{padding:10px 18px;border-radius:10px;border:none;background:var(--primary);color:#fff;cursor:pointer}
+    .ejemplos{font-size:12px;color:var(--muted)}
+    .ejemplos span{display:inline-block;padding:6px 10px;border-radius:6px;background:rgba(0,0,0,0.03);cursor:pointer;margin:6px 6px 0 0}
+
+    .canvas-container{flex:1;background:transparent;border-radius:12px;padding:16px;min-height:300px}
+    canvas{background:var(--panel-bg);border-radius:12px;padding:12px;width:100%;height:100%}
+
+    /* select y toggles */
+    .select, .theme-btn{border-radius:10px;padding:8px 12px;border:1px solid var(--input-border);background:transparent;cursor:pointer}
+    .select{appearance:none}
+
+    /* responsive */
+    @media (max-width:1100px){
+      .container{grid-template-columns:1fr; padding-bottom:30px}
+      .left{height:auto}
+      .right{height:auto}
+      canvas{height:420px}
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Panel calculadora -->
-    <div class="calculadora-panel">
+    <!-- PANEL IZQUIERDO: calculadora -->
+    <div class="panel left">
       <div class="header">
-        <h1 id="title">🧮 Calculadora</h1>
-        <div class="controls">
-          <select id="lang" class="selector" onchange="cambiarIdioma(this.value)">
-            <option value="es">ESP</option>
-            <option value="en">ENG</option>
-            <option value="fr">FRA</option>
-            <option value="de">GER</option>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:42px;height:42px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:var(--btn-text);font-weight:900">🧮</div>
+          <div>
+            <div class="brand-title" data-i18n="title">Calculadora</div>
+            <div style="font-size:12px;color:var(--muted)" data-i18n="subtitle">Simple y elegante</div>
+          </div>
+        </div>
+
+        <div class="header-controls">
+          <select id="languageSelect" class="select" title="Idioma">
+            <option value="esp">ESP</option>
+            <option value="eng">ENG</option>
+            <option value="fra">FRA</option>
+            <option value="ger">GER</option>
           </select>
-          <button class="modo" onclick="toggleModo()">🌙/☀️</button>
+
+          <button id="themeToggle" class="theme-btn" title="Toggle theme">🌙</button>
         </div>
       </div>
 
-      <div class="display"><div class="operacion-actual" id="operacionActual"></div><div id="display">0</div></div>
-
-      <!-- Botones numéricos -->
-      <div class="input-numeros">
-        <button class="btn-numero" onclick="agregarDigito('7')">7</button>
-        <button class="btn-numero" onclick="agregarDigito('8')">8</button>
-        <button class="btn-numero" onclick="agregarDigito('9')">9</button>
-        <button class="btn-numero" onclick="agregarDigito('4')">4</button>
-        <button class="btn-numero" onclick="agregarDigito('5')">5</button>
-        <button class="btn-numero" onclick="agregarDigito('6')">6</button>
-        <button class="btn-numero" onclick="agregarDigito('1')">1</button>
-        <button class="btn-numero" onclick="agregarDigito('2')">2</button>
-        <button class="btn-numero" onclick="agregarDigito('3')">3</button>
-        <button class="btn-numero" onclick="agregarDigito('0')">0</button>
-        <button class="btn-numero" onclick="agregarDigito('.')">.</button>
-        <button class="btn-numero btn-borrar" onclick="borrarDigito()">⌫</button>
+      <div class="display" aria-live="polite">
+        <div class="operacion-actual" id="operacionActual"></div>
+        <div id="display">0</div>
       </div>
 
-      <!-- Operaciones -->
+      <div class="input-numeros" id="numPad">
+        <!-- números -->
+        <button class="btn-numero" data-num="7">7</button>
+        <button class="btn-numero" data-num="8">8</button>
+        <button class="btn-numero" data-num="9">9</button>
+
+        <button class="btn-numero" data-num="4">4</button>
+        <button class="btn-numero" data-num="5">5</button>
+        <button class="btn-numero" data-num="6">6</button>
+
+        <button class="btn-numero" data-num="1">1</button>
+        <button class="btn-numero" data-num="2">2</button>
+        <button class="btn-numero" data-num="3">3</button>
+
+        <button class="btn-numero" data-num="0">0</button>
+        <button class="btn-numero btn-punto" data-num=".">.</button>
+        <button class="btn-numero btn-borrar" id="btnBack">⌫</button>
+      </div>
+
       <div class="botones">
-        <button class="boton suma" onclick="setOperacion('suma')" id="btnSuma">+ Suma</button>
-        <button class="boton resta" onclick="setOperacion('resta')" id="btnResta">- Resta</button>
-        <button class="boton multiplicar" onclick="setOperacion('multiplicar')" id="btnMulti">× Multiplicar</button>
-        <button class="boton dividir" onclick="setOperacion('dividir')" id="btnDiv">÷ Dividir</button>
+        <button class="boton suma" id="btnSuma" data-i18n="btnSuma">+ Suma</button>
+        <button class="boton resta" id="btnResta" data-i18n="btnResta">- Resta</button>
+        <button class="boton multiplicar" id="btnMultiplicar" data-i18n="btnMultiplicar">× Multiplicar</button>
+        <button class="boton dividir" id="btnDividir" data-i18n="btnDividir">÷ Dividir</button>
       </div>
-      <button class="boton calcular" onclick="calcular()" id="btnCalc">✓ Calcular / Enter</button>
-      <button class="boton limpiar" onclick="limpiar()" id="btnClear">Limpiar Todo</button>
+
+      <button class="calcular" id="btnCalcular" data-i18n="btnCalcular">✓ Calcular / Enter</button>
+      <button class="limpiar" id="btnLimpiar" data-i18n="btnLimpiar">Limpiar Todo</button>
+
+      <div class="seccion">
+        <div class="seccion-titulo" data-i18n="advTitle">⚡ OPERACIONES AVANZADAS:</div>
+        <div class="botones-avanzados">
+          <button class="boton-avanzado modulo" data-op="modulo" data-i18n="modulo">Módulo (resto)</button>
+          <button class="boton-avanzado potencia" data-op="potencia" data-i18n="potencia">Potencia (a^b)</button>
+          <button class="boton-avanzado raiz" data-op="raiz" data-i18n="raiz">Raíz cuadrada</button>
+          <button class="boton-avanzado raiz-n" data-op="raizN" data-i18n="raizn">Raíz n-ésima</button>
+          <button class="boton-avanzado logaritmo" data-op="log10" data-i18n="log10">Logaritmo (base 10)</button>
+          <button class="boton-avanzado ln" data-op="ln" data-i18n="ln">Logaritmo natural (ln)</button>
+          <button class="boton-avanzado log-custom" data-op="logCustom" data-i18n="logCustom">Log (base personalizada)</button>
+        </div>
+      </div>
+
+      <div class="seccion">
+        <div class="seccion-titulo" data-i18n="trigTitle">📐 FUNCIONES TRIGONOMÉTRICAS:</div>
+        <div class="botones-avanzados">
+          <button class="boton-avanzado seno" data-op="seno" data-i18n="seno">Seno</button>
+          <button class="boton-avanzado coseno" data-op="coseno" data-i18n="coseno">Coseno</button>
+          <button class="boton-avanzado tangente" data-op="tangente" data-i18n="tangente">Tangente</button>
+          <button class="boton-avanzado arcoseno" data-op="arcoseno" data-i18n="arcoseno">Arcoseno</button>
+          <button class="boton-avanzado arcocoseno" data-op="arcocoseno" data-i18n="arcocoseno">Arcocoseno</button>
+          <button class="boton-avanzado arcotangente" data-op="arcotangente" data-i18n="arcotangente">Arcotangente</button>
+        </div>
+      </div>
+
+      <div class="seccion">
+        <div class="seccion-titulo" data-i18n="otherTitle">🎯 OTRAS FUNCIONES:</div>
+        <div class="botones-avanzados">
+          <button class="boton-avanzado factorial" data-op="factorial" data-i18n="factorial">Factorial</button>
+          <button class="boton-avanzado absoluto" data-op="absoluto" data-i18n="absoluto">Valor absoluto</button>
+          <button class="boton-avanzado redondeo" data-op="redondeo" data-i18n="redondeo">Redondeo</button>
+        </div>
+      </div>
+
+      <div class="seccion">
+        <div class="seccion-titulo" data-i18n="constTitle">⭐ CONSTANTES:</div>
+        <div class="botones-avanzados">
+          <button class="boton-avanzado pi" data-op="pi" data-i18n="pi">Mostrar π (pi)</button>
+          <button class="boton-avanzado euler" data-op="e" data-i18n="euler">Mostrar e (Euler)</button>
+        </div>
+      </div>
 
       <div class="historial">
-        <div class="historial-titulo" id="historyTitle">📝 Historial</div>
+        <div class="seccion-titulo" data-i18n="historialTitle">📝 Historial</div>
         <div id="historial"></div>
       </div>
-      <div class="footer" id="footer">📱 ❤️ Hecho con amor por Pepe Gamboa</div>
+
+      <div style="text-align:center;padding-top:8px;color:var(--muted);font-size:13px">
+        <span data-i18n="footer">📱 ❤️ Hecho con amor por Pepe Gamboa</span>
+      </div>
     </div>
 
-    <!-- Panel gráfica -->
-    <div class="grafica-panel">
+    <!-- PANEL DERECHO: gráficas -->
+    <div class="panel right">
       <div class="grafica-header">
-        <h2 id="graphTitle">📊 Visualización Gráfica</h2>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:20px;font-weight:800;color:var(--primary)" data-i18n="grafTitle">📊 Visualización Gráfica</div>
+        </div>
+
         <div class="input-funcion">
-          <input type="text" id="funcionInput" placeholder="Ej: sin(x), x^2, log(x)">
-          <button class="boton-graficar" onclick="graficarFuncion()" id="btnGraph">Graficar</button>
+          <input id="funcionInput" placeholder="Escribe tu función, ej: sin(x), x^2, log(x)" />
+          <button class="boton-graficar" id="btnGraficar" data-i18n="btnGraficar">Graficar</button>
+        </div>
+
+        <div class="ejemplos" id="ejemplos">
+          <strong data-i18n="ejemplosLabel">Ejemplos de funciones:</strong>
+          <div style="margin-top:8px">
+            <span class="ejemplo" data-fn="sin(x)">sin(x)</span>
+            <span class="ejemplo" data-fn="cos(x)">cos(x)</span>
+            <span class="ejemplo" data-fn="x^2">x²</span>
+            <span class="ejemplo" data-fn="x^3 - 2*x">x³-2x</span>
+            <span class="ejemplo" data-fn="log10(x)">log(x)</span>
+            <span class="ejemplo" data-fn="sqrt(x)">√x</span>
+            <span class="ejemplo" data-fn="abs(x)">|x|</span>
+            <span class="ejemplo" data-fn="exp(x)">eˣ</span>
+          </div>
         </div>
       </div>
-      <div class="canvas-container"><canvas id="grafica"></canvas></div>
+
+      <div class="canvas-container">
+        <canvas id="grafica"></canvas>
+      </div>
     </div>
   </div>
 
-<script>
-/* === Variables y estado === */
-let valorActual='0', operacion=null, primerNumero=null, historialArray=[], chart=null, nuevoNumero=true;
+  <script>
+    /* -------------------------------
+       Traducciones (ESP / ENG / FRA / GER)
+       keys usadas por data-i18n en elementos
+       ------------------------------- */
+    const translations = {
+      esp: {
+        title: "Calculadora",
+        subtitle: "Simple y elegante",
+        btnSuma: "+ Suma",
+        btnResta: "- Resta",
+        btnMultiplicar: "× Multiplicar",
+        btnDividir: "÷ Dividir",
+        btnCalcular: "✓ Calcular / Enter",
+        btnLimpiar: "Limpiar Todo",
+        advTitle: "⚡ OPERACIONES AVANZADAS:",
+        modulo: "Módulo (resto)",
+        potencia: "Potencia (a^b)",
+        raiz: "Raíz cuadrada",
+        raizn: "Raíz n-ésima",
+        log10: "Logaritmo (base 10)",
+        ln: "Logaritmo natural (ln)",
+        logCustom: "Log (base personalizada)",
+        trigTitle: "📐 FUNCIONES TRIGONOMÉTRICAS:",
+        seno: "Seno", coseno: "Coseno", tangente: "Tangente",
+        arcoseno: "Arcoseno", arcocoseno: "Arcocoseno", arcotangente: "Arcotangente",
+        otherTitle: "🎯 OTRAS FUNCIONES:",
+        factorial: "Factorial", absoluto: "Valor absoluto", redondeo: "Redondeo",
+        constTitle: "⭐ CONSTANTES:", pi: "Mostrar π (pi)", euler: "Mostrar e (Euler)",
+        historialTitle: "📝 Historial",
+        footer: "📱 ❤️ Hecho con amor por Pepe Gamboa",
+        grafTitle: "📊 Visualización Gráfica",
+        btnGraficar: "Graficar",
+        ejemplosLabel: "Ejemplos de funciones:",
+        msgEnterNumber: "Por favor ingresa un número válido",
+        msgDivideZero: "No se puede dividir por cero",
+        msgInvalidRoot: "No se puede calcular raíz de número negativo",
+        msgLogPositive: "Logaritmo solo para números positivos",
+        msgFactorialInt: "Factorial solo para enteros positivos",
+        placeholderFunc: "Escribe tu función, ej: sin(x), x^2, log(x)"
+      },
+      eng: {
+        title: "Calculator",
+        subtitle: "Clean & elegant",
+        btnSuma: "+ Add",
+        btnResta: "- Subtract",
+        btnMultiplicar: "× Multiply",
+        btnDividir: "÷ Divide",
+        btnCalcular: "✓ Calculate / Enter",
+        btnLimpiar: "Clear All",
+        advTitle: "⚡ ADVANCED OPERATIONS:",
+        modulo: "Modulo (remainder)",
+        potencia: "Power (a^b)",
+        raiz: "Square root",
+        raizn: "n-th root",
+        log10: "Logarithm (base 10)",
+        ln: "Natural log (ln)",
+        logCustom: "Log (custom base)",
+        trigTitle: "📐 TRIGONOMETRIC FUNCTIONS:",
+        seno: "Sine", coseno: "Cosine", tangente: "Tangent",
+        arcoseno: "Arcsine", arcocoseno: "Arccos", arcotangente: "Arctan",
+        otherTitle: "🎯 OTHER FUNCTIONS:",
+        factorial: "Factorial", absoluto: "Absolute", redondeo: "Round",
+        constTitle: "⭐ CONSTANTS:", pi: "Show π (pi)", euler: "Show e (Euler)",
+        historialTitle: "📝 History",
+        footer: "📱 ❤️ Made with love by Pepe Gamboa",
+        grafTitle: "📊 Graph Visualization",
+        btnGraficar: "Plot",
+        ejemplosLabel: "Examples:",
+        msgEnterNumber: "Please enter a valid number",
+        msgDivideZero: "Cannot divide by zero",
+        msgInvalidRoot: "Cannot take root of negative number",
+        msgLogPositive: "Log only for positive numbers",
+        msgFactorialInt: "Factorial only for positive integers",
+        placeholderFunc: "Type a function, e.g.: sin(x), x^2, log(x)"
+      },
+      fra: {
+        title: "Calculatrice",
+        subtitle: "Simple et élégante",
+        btnSuma: "+ Addition",
+        btnResta: "- Soustraction",
+        btnMultiplicar: "× Multiplier",
+        btnDividir: "÷ Diviser",
+        btnCalcular: "✓ Calculer / Enter",
+        btnLimpiar: "Tout effacer",
+        advTitle: "⚡ OPÉRATIONS AVANCÉES:",
+        modulo: "Modulo (reste)",
+        potencia: "Puissance (a^b)",
+        raiz: "Racine carrée",
+        raizn: "Racine n-ième",
+        log10: "Logarithme (base 10)",
+        ln: "Log naturel (ln)",
+        logCustom: "Log (base personnalisée)",
+        trigTitle: "📐 FONCTIONS TRIGONOMÉTRIQUES:",
+        seno: "Sinus", coseno: "Cosinus", tangente: "Tangente",
+        arcoseno: "Arcsinus", arcocoseno: "Arccos", arcotangente: "Arctan",
+        otherTitle: "🎯 AUTRES FONCTIONS:",
+        factorial: "Factorielle", absoluto: "Valeur absolue", redondeo: "Arrondir",
+        constTitle: "⭐ CONSTANTES:", pi: "Afficher π (pi)", euler: "Afficher e (Euler)",
+        historialTitle: "📝 Historique",
+        footer: "📱 ❤️ Fait avec amour par Pepe Gamboa",
+        grafTitle: "📊 Visualisation Graphique",
+        btnGraficar: "Tracer",
+        ejemplosLabel: "Exemples:",
+        msgEnterNumber: "Entrez un nombre valide",
+        msgDivideZero: "Impossible de diviser par zéro",
+        msgInvalidRoot: "Impossible de calculer la racine d'un négatif",
+        msgLogPositive: "Log pour nombres positifs seulement",
+        msgFactorialInt: "Factorielle pour entiers positifs seulement",
+        placeholderFunc: "Tapez une fonction, ex: sin(x), x^2, log(x)"
+      },
+      ger: {
+        title: "Taschenrechner",
+        subtitle: "Einfach & elegant",
+        btnSuma: "+ Addieren",
+        btnResta: "- Subtrahieren",
+        btnMultiplicar: "× Multiplizieren",
+        btnDividir: "÷ Teilen",
+        btnCalcular: "✓ Berechnen / Enter",
+        btnLimpiar: "Alles löschen",
+        advTitle: "⚡ ERWEITERTE OPERATIONEN:",
+        modulo: "Modulo (Rest)",
+        potencia: "Potenz (a^b)",
+        raiz: "Quadratwurzel",
+        raizn: "n-te Wurzel",
+        log10: "Logarithmus (Basis 10)",
+        ln: "Natürlicher Log (ln)",
+        logCustom: "Log (eigene Basis)",
+        trigTitle: "📐 TRIGONOMETRISCHE FUNKTIONEN:",
+        seno: "Sinus", coseno: "Cosinus", tangente: "Tangens",
+        arcoseno: "Arcsinus", arcocoseno: "Arccos", arcotangente: "Arctan",
+        otherTitle: "🎯 ANDERE FUNKTIONEN:",
+        factorial: "Fakultät", absoluto: "Betrag", redondeo: "Runden",
+        constTitle: "⭐ KONSTANTEN:", pi: "π anzeigen (pi)", euler: "e anzeigen (Euler)",
+        historialTitle: "📝 Verlauf",
+        footer: "📱 ❤️ Mit Liebe gemacht von Pepe Gamboa",
+        grafTitle: "📊 Grafik-Visualisierung",
+        btnGraficar: "Plotten",
+        ejemplosLabel: "Beispiele:",
+        msgEnterNumber: "Bitte gültige Zahl eingeben",
+        msgDivideZero: "Durch Null teilen nicht möglich",
+        msgInvalidRoot: "Wurzel aus negativem Wert nicht möglich",
+        msgLogPositive: "Log nur für positive Zahlen",
+        msgFactorialInt: "Fakultät nur für positive ganze Zahlen",
+        placeholderFunc: "Funktion eingeben, z.B. sin(x), x^2, log(x)"
+      }
+    };
 
-/* === Multilenguaje === */
-const textos={
-  es:{title:"🧮 Calculadora",btnSuma:"+ Suma",btnResta:"- Resta",btnMulti:"× Multiplicar",btnDiv:"÷ Dividir",
-      btnCalc:"✓ Calcular / Enter",btnClear:"Limpiar Todo",historyTitle:"📝 Historial",footer:"📱 ❤️ Hecho con amor por Pepe Gamboa",
-      graphTitle:"📊 Visualización Gráfica",btnGraph:"Graficar"},
-  en:{title:"🧮 Calculator",btnSuma:"+ Add",btnResta:"- Subtract",btnMulti:"× Multiply",btnDiv:"÷ Divide",
-      btnCalc:"✓ Calculate / Enter",btnClear:"Clear All",historyTitle:"📝 History",footer:"📱 ❤️ Made with love by Pepe Gamboa",
-      graphTitle:"📊 Graph Visualization",btnGraph:"Plot"},
-  fr:{title:"🧮 Calculatrice",btnSuma:"+ Addition",btnResta:"- Soustraction",btnMulti:"× Multiplication",btnDiv:"÷ Division",
-      btnCalc:"✓ Calculer / Entrée",btnClear:"Effacer Tout",historyTitle:"📝 Historique",footer:"📱 ❤️ Fait avec amour par Pepe Gamboa",
-      graphTitle:"📊 Visualisation Graphique",btnGraph:"Tracer"},
-  de:{title:"🧮 Rechner",btnSuma:"+ Addieren",btnResta:"- Subtrahieren",btnMulti:"× Multiplizieren",btnDiv:"÷ Dividieren",
-      btnCalc:"✓ Berechnen / Eingabe",btnClear:"Alles Löschen",historyTitle:"📝 Verlauf",footer:"📱 ❤️ Mit Liebe gemacht von Pepe Gamboa",
-      graphTitle:"📊 Grafische Darstellung",btnGraph:"Zeichnen"}
-};
-function cambiarIdioma(lang){
-  const t=textos[lang];
-  document.getElementById('title').textContent=t.title;
-  document.getElementById('btnSuma').textContent=t.btnSuma;
-  document.getElementById('btnResta').textContent=t.btnResta;
-  document.getElementById('btnMulti').textContent=t.btnMulti;
-  document.getElementById('btnDiv').textContent=t.btnDiv;
-  document.getElementById('btnCalc').textContent=t.btnCalc;
-  document.getElementById('btnClear').textContent=t.btnClear;
-  document.getElementById('historyTitle').textContent=t.historyTitle;
-  document.getElementById('footer').textContent=t.footer;
-  document.getElementById('graphTitle').textContent=t.graphTitle;
-  document.getElementById('btnGraph').textContent=t.btnGraph;
-}
+    let currentLang = localStorage.getItem('calc_lang') || 'esp';
 
-/* === Modo oscuro === */
-function toggleModo(){document.body.classList.toggle('dark');}
+    /* -------------------------------
+       Variables de calculadora y gráfico
+       ------------------------------- */
+    let valorActual = '0';
+    let operacion = null;
+    let primerNumero = null;
+    let historialArray = [];
+    let chart = null;
+    let nuevoNumero = true;
 
-/* === Funcionalidad calculadora === */
-function actualizarDisplay(){
-  document.getElementById('display').textContent=valorActual;
-  document.getElementById('operacionActual').textContent=(operacion&&primerNumero!==null)? `${primerNumero} ${operacion}`:'';
-}
-function agregarDigito(d){if(nuevoNumero){valorActual=(d==='.')?'0.':d;nuevoNumero=false;}else{if(d==='.'&&valorActual.includes('.'))return;valorActual+=d;}actualizarDisplay();}
-function borrarDigito(){valorActual=(valorActual.length>1)?valorActual.slice(0,-1):'0';actualizarDisplay();}
-function setOperacion(op){primerNumero=parseFloat(valorActual);operacion=op;nuevoNumero=true;actualizarDisplay();}
-function limpiar(){valorActual='0';operacion=null;primerNumero=null;nuevoNumero=true;actualizarDisplay();}
-function agregarHistorial(txt){historialArray.unshift(txt);if(historialArray.length>10)historialArray.pop();
-  document.getElementById('historial').innerHTML=historialArray.map(i=>`<div class="historial-item">${i}</div>`).join('');}
-function calcular(){
-  if(primerNumero===null||operacion===null)return;
-  let segundoNumero=parseFloat(valorActual), resultado;
-  try{
-    switch(operacion){
-      case 'suma':resultado=primerNumero+segundoNumero;visualizarOperacion('suma',primerNumero,segundoNumero,resultado);break;
-      case 'resta':resultado=primerNumero-segundoNumero;visualizarOperacion('resta',primerNumero,segundoNumero,resultado);break;
-      case 'multiplicar':resultado=primerNumero*segundoNumero;visualizarOperacion('multiplicar',primerNumero,segundoNumero,resultado);break;
-      case 'dividir':if(segundoNumero===0)throw new Error("No se puede dividir por cero");resultado=primerNumero/segundoNumero;visualizarOperacion('dividir',primerNumero,segundoNumero,resultado);break;
+    /* -------------------------------
+       UTIL: obtener texto traducido
+       ------------------------------- */
+    function t(key){
+      const tr = translations[currentLang] || translations.esp;
+      return tr[key] !== undefined ? tr[key] : key;
     }
-    valorActual=resultado.toString();agregarHistorial(`${primerNumero} ${operacion} ${segundoNumero} = ${valorActual}`);
-    primerNumero=null;operacion=null;nuevoNumero=true;actualizarDisplay();
-  }catch(e){alert(e.message);limpiar();}
-}
 
-/* === Gráfica === */
-function inicializarGrafica(){
-  chart=new Chart(document.getElementById('grafica').getContext('2d'),{
-    type:'line',
-    data:{labels:[],datasets:[{label:'f(x)',data:[],borderColor:'rgb(102,126,234)',backgroundColor:'rgba(102,126,234,0.1)',tension:0.3,borderWidth:3,pointRadius:0}]},
-    options:{responsive:true,maintainAspectRatio:false}
-  });
-}
-function graficarFuncion(){
-  let f=document.getElementById('funcionInput').value.trim();if(!f)return alert("Escribe una función");
-  let x=[],y=[];for(let i=-10;i<=10;i+=0.1){try{y.push(math.evaluate(f,{x:i}));x.push(i);}catch(e){}}
-  chart.data.labels=x;chart.data.datasets[0].data=y;chart.data.datasets[0].label=`f(x)=${f}`;chart.update();
-}
-function visualizarOperacion(tipo,a,b,res){
-  let x=[],y=[],titulo='',colores={
-    suma:{c:'rgb(17,153,142)',bg:'rgba(17,153,142,0.2)'},
-    resta:{c:'rgb(240,147,251)',bg:'rgba(240,147,251,0.2)'},
-    multiplicar:{c:'rgb(79,172,254)',bg:'rgba(79,172,254,0.2)'},
-    dividir:{c:'rgb(250,112,154)',bg:'rgba(250,112,154,0.2)'}
-  };
-  if(tipo==='suma'){titulo=`${a}+${b}=${res}`;x=[0,1,2];y=[0,a,res];}
-  if(tipo==='resta'){titulo=`${a}-${b}=${res}`;x=[0,1,2];y=[0,a,res];}
-  if(tipo==='multiplicar'){titulo=`${a}×${b}=${res}`;for(let i=0;i<=1;i+=0.05){x.push(i);y.push(res*i);} }
-  if(tipo==='dividir'){titulo=`${a}÷${b}=${res}`;for(let i=0;i<=1;i+=0.05){x.push(i);y.push(a-(a-res)*i);} }
-  chart.data.labels=x;chart.data.datasets[0].data=y;chart.data.datasets[0].label=titulo;
-  chart.data.datasets[0].borderColor=colores[tipo].c;chart.data.datasets[0].backgroundColor=colores[tipo].bg;chart.update();
-}
+    /* -------------------------------
+       Aplicar traducciones a la UI
+       - marcas con data-i18n
+       ------------------------------- */
+    function applyTranslations(){
+      document.querySelectorAll('[data-i18n]').forEach(el=>{
+        const key = el.getAttribute('data-i18n');
+        el.textContent = t(key);
+      });
+      // placeholder específico
+      document.getElementById('funcionInput').placeholder = t('placeholderFunc');
+    }
 
-/* === Test automático === */
-function testOperaciones(){
-  const pruebas=[{a:5,op:'s
+    /* -------------------------------
+       Modo claro/oscuro
+       ------------------------------- */
+    const themeToggle = document.getElementById('themeToggle');
+    function setTheme(dark){
+      if(dark) document.body.classList.add('dark');
+      else document.body.classList.remove('dark');
+      localStorage.setItem('calc_theme', dark ? 'dark' : 'light');
+      themeToggle.textContent = dark ? '☀️' : '🌙';
+    }
+    // init theme
+    (function(){
+      const saved = localStorage.getItem('calc_theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+      setTheme(saved === 'dark');
+    })();
+    themeToggle.addEventListener('click', ()=> setTheme(!document.body.classList.contains('dark')));
+
+    /* -------------------------------
+       DOM helpers: actualizar display e historial
+       ------------------------------- */
+    function actualizarDisplay(){
+      document.getElementById('display').textContent = valorActual;
+      const opActual = document.getElementById('operacionActual');
+      if(operacion && primerNumero !== null){
+        const simbolos = {suma:'+',resta:'-',multiplicar:'×',dividir:'÷',potencia:'^',modulo:'mod',logCustom:'log'};
+        opActual.textContent = `${primerNumero} ${simbolos[operacion] || ''}`;
+      } else opActual.textContent = '';
+    }
+
+    function agregarHistorial(texto){
+      historialArray.unshift(texto);
+      if(historialArray.length>12) historialArray.length = 12;
+      const div = document.getElementById('historial');
+      div.innerHTML = historialArray.map(i => `<div class="historial-item">${i}</div>`).join('');
+      // click para usar en display
+      div.querySelectorAll('.historial-item').forEach((el,idx)=>{
+        el.addEventListener('click', ()=> {
+          valorActual = historialArray[idx].split(' = ')[0] || '0';
+          actualizarDisplay();
+        });
+      });
+    }
+
+    /* -------------------------------
+       Funciones básicas calculadora
+       ------------------------------- */
+    function agregarDigito(digito){
+      if(nuevoNumero){
+        valorActual = digito === '.' ? '0.' : digito;
+        nuevoNumero = false;
+      } else {
+        if(digito === '.' && valorActual.includes('.')) return;
+        valorActual = (valorActual === '0' && digito !== '.') ? digito : valorActual + digito;
+      }
+      actualizarDisplay();
+    }
+
+    function borrarDigito(){
+      if(valorActual.length > 1) valorActual = valorActual.slice(0,-1);
+      else valorActual = '0';
+      actualizarDisplay();
+    }
+
+    function setOperacion(op){
+      if(valorActual === '' || valorActual === '.') { alert(t('msgEnterNumber')); return; }
+      if(primerNumero !== null && operacion !== null && !nuevoNumero) calcular();
+      primerNumero = parseFloat(valorActual);
+      operacion = op;
+      nuevoNumero = true;
+      actualizarDisplay();
+    }
+
+    function calcular(){
+      if(primerNumero === null || operacion === null) return;
+      let segundoNumero = parseFloat(valorActual);
+      let resultado;
+      let operacionTexto = '';
+      try{
+        switch(operacion){
+          case 'suma':
+            resultado = primerNumero + segundoNumero;
+            operacionTexto = `${primerNumero} + ${segundoNumero}`;
+            visualizarOperacion('suma', primerNumero, segundoNumero, resultado);
+            break;
+          case 'resta':
+            resultado = primerNumero - segundoNumero;
+            operacionTexto = `${primerNumero} - ${segundoNumero}`;
+            visualizarOperacion('resta', primerNumero, segundoNumero, resultado);
+            break;
+          case 'multiplicar':
+            resultado = primerNumero * segundoNumero;
+            operacionTexto = `${primerNumero} × ${segundoNumero}`;
+            visualizarOperacion('multiplicar', primerNumero, segundoNumero, resultado);
+            break;
+          case 'dividir':
+            if(segundoNumero === 0) throw new Error(t('msgDivideZero'));
+            resultado = primerNumero / segundoNumero;
+            operacionTexto = `${primerNumero} ÷ ${segundoNumero}`;
+            visualizarOperacion('dividir', primerNumero, segundoNumero, resultado);
+            break;
+          case 'potencia':
+            resultado = Math.pow(primerNumero, segundoNumero);
+            operacionTexto = `${primerNumero}^${segundoNumero}`;
+            break;
+          case 'modulo':
+            resultado = primerNumero % segundoNumero;
+            operacionTexto = `${primerNumero} mod ${segundoNumero}`;
+            break;
+          case 'logCustom':
+            if(primerNumero <= 0 || segundoNumero <= 0) throw new Error(t('msgLogPositive'));
+            resultado = Math.log(primerNumero)/Math.log(segundoNumero);
+            operacionTexto = `log${segundoNumero}(${primerNumero})`;
+            break;
+        }
+        valorActual = Number.isFinite(resultado) ? resultado.toFixed(10).replace(/\.?0+$/,'') : 'NaN';
+        agregarHistorial(`${operacionTexto} = ${valorActual}`);
+        actualizarDisplay();
+        primerNumero = null; operacion = null; nuevoNumero = true;
+      } catch(err){
+        alert(err.message || err);
+        limpiar();
+      }
+    }
+
+    function operacionUnaria(tipo){
+      let numero = parseFloat(valorActual);
+      if(isNaN(numero)){ alert(t('msgEnterNumber')); return; }
+      let resultado; let operacionTexto='';
+      try{
+        switch(tipo){
+          case 'raiz':
+            if(numero < 0) throw new Error(t('msgInvalidRoot'));
+            resultado = Math.sqrt(numero); operacionTexto = `√${numero}`; break;
+          case 'raizN':
+            let n = prompt(t('placeholderFunc') + " (n)"); if(n===null || n==='') return; n = parseFloat(n); if(isNaN(n)) throw new Error(t('msgEnterNumber'));
+            resultado = Math.pow(numero, 1/n); operacionTexto = `${n}√${numero}`; break;
+          case 'log10':
+            if(numero <= 0) throw new Error(t('msgLogPositive')); resultado = Math.log10(numero); operacionTexto = `log(${numero})`; break;
+          case 'ln':
+            if(numero <= 0) throw new Error(t('msgLogPositive')); resultado = Math.log(numero); operacionTexto = `ln(${numero})`; break;
+          case 'seno': resultado = Math.sin(numero); operacionTexto=`sin(${numero})`; break;
+          case 'coseno': resultado = Math.cos(numero); operacionTexto=`cos(${numero})`; break;
+          case 'tangente': resultado = Math.tan(numero); operacionTexto=`tan(${numero})`; break;
+          case 'arcoseno': if(numero < -1 || numero > 1) throw new Error(t('msgEnterNumber')); resultado = Math.asin(numero); operacionTexto=`arcsin(${numero})`; break;
+          case 'arcocoseno': if(numero < -1 || numero > 1) throw new Error(t('msgEnterNumber')); resultado = Math.acos(numero); operacionTexto=`arccos(${numero})`; break;
+          case 'arcotangente': resultado = Math.atan(numero); operacionTexto=`arctan(${numero})`; break;
+          case 'factorial': if(numero < 0 || numero % 1 !== 0) throw new Error(t('msgFactorialInt')); if(numero > 170) throw new Error('Number too large'); resultado = factorial(numero); operacionTexto=`${numero}!`; break;
+          case 'absoluto': resultado = Math.abs(numero); operacionTexto=`|${numero}|`; break;
+          case 'redondeo': resultado = Math.round(numero); operacionTexto=`round(${numero})`; break;
+          default: return;
+        }
+        valorActual = Number.isFinite(resultado) ? resultado.toFixed(10).replace(/\.?0+$/,'') : 'NaN';
+        agregarHistorial(`${operacionTexto} = ${valorActual}`);
+        nuevoNumero = true; actualizarDisplay();
+      } catch(e){ alert(e.message || e); }
+    }
+
+    function factorial(n){ if(n === 0 || n === 1) return 1; let r = 1; for(let i=2;i<=n;i++) r *= i; return r; }
+
+    function insertarConstante(tipo){
+      if(tipo === 'pi'){ valorActual = Math.PI.toFixed(10).replace(/\.?0+$/,''); agregarHistorial(`π = ${valorActual}`); }
+      else if(tipo === 'e'){ valorActual = Math.E.toFixed(10).replace(/\.?0+$/,''); agregarHistorial(`e = ${valorActual}`); }
+      nuevoNumero = true; actualizarDisplay();
+    }
+
+    function limpiar(){ valorActual = '0'; operacion = null; primerNumero = null; nuevoNumero = true; actualizarDisplay(); }
+
+    /* -------------------------------
+       GRÁFICAS: inicializar + graficar función
+       ------------------------------- */
+    function inicializarGrafica(){
+      const ctx = document.getElementById('grafica').getContext('2d');
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'f(x)', data: [], borderColor: getComputedStyle(document.documentElement).getPropertyValue('--primary') || '#667eea', tension: 0.35, borderWidth: 3, pointRadius: 0, backgroundColor:'transparent' }]},
+        options: {
+          responsive:true, maintainAspectRatio:false,
+          plugins: { legend:{display:true, labels:{font:{size:13}}}, tooltip:{mode:'index',intersect:false} },
+          scales:{ x:{ title:{display:true,text:'x'} , grid:{color:getComputedStyle(document.documentElement).getPropertyValue('--chart-grid') || 'rgba(0,0,0,0.06)'} }, y:{ title:{display:true,text:'f(x)'}, grid:{color:getComputedStyle(document.documentElement).getPropertyValue('--chart-grid') || 'rgba(0,0,0,0.06)'} } }
+        }
+      });
+    }
+
+    function graficarFuncion(){
+      const funcion = document.getElementById('funcionInput').value.trim();
+      if(!funcion){ alert(t('placeholderFunc')); return; }
+      try{
+        // preparar para math.js (acepta ^)
+        const procesada = funcion.replace(/log\(/g,'log10(');
+        const xVals=[], yVals=[];
+        const paso = 0.05, rango = 10;
+        for(let x=-rango; x<=rango; x += paso){
+          try{
+            const y = math.evaluate(procesada, {x});
+            if(Number.isFinite(y) && Math.abs(y) < 1e7){
+              xVals.push(parseFloat(x.toFixed(2))); yVals.push(y);
+            }
+          }catch(_){ /* punto no evaluable */ }
+        }
+        if(xVals.length === 0) throw new Error('No valid points');
+        chart.data.labels = xVals; chart.data.datasets[0].data = yVals;
+        chart.data.datasets[0].label = `f(x) = ${funcion}`;
+        chart.update();
+        agregarHistorial(`Graficada: ${funcion}`);
+      }catch(err){
+        alert('Error al graficar: ' + (err.message || err));
+      }
+    }
+
+    function graficarEjemplo(fn){ document.getElementById('funcionInput').value = fn; graficarFuncion(); }
+
+    /* -------------------------------
+       Visualización especial para operaciones básicas
+       - dibuja un gráfico representativo de la operación
+       ------------------------------- */
+    function visualizarOperacion(tipo,a,b,resultado){
+      const xValues=[], yValues=[]; let titulo='';
+      if(tipo === 'suma'){
+        titulo = `${t('btnSuma')}: ${a} + ${b} = ${resultado}`;
+        for(let i=0;i<=100;i++){ xValues.push(i/100); yValues.push(0); }
+        for(let i=100;i<=200;i++){ xValues.push(i/100); yValues.push(a); }
+        for(let i=200;i<=300;i++){ xValues.push(i/100); yValues.push(resultado); }
+      } else if(tipo === 'resta'){
+        titulo = `${t('btnResta')}: ${a} - ${b} = ${resultado}`;
+        for(let i=0;i<=100;i++){ xValues.push(i/100); yValues.push(0); }
+        for(let i=100;i<=200;i++){ xValues.push(i/100); yValues.push(a); }
+        for(let i=200;i<=300;i++){ xValues.push(i/100); yValues.push(resultado); }
+      } else if(tipo === 'multiplicar'){
+        titulo = `${t('btnMultiplicar')}: ${a} × ${b} = ${resultado}`;
+        for(let i=0;i<=100;i++){ xValues.push(i/100); yValues.push(0); }
+        for(let i=100;i<=300;i++){ const p=(i-100)/200; xValues.push(i/100); yValues.push(p*resultado); }
+      } else if(tipo === 'dividir'){
+        titulo = `${t('btnDividir')}: ${a} ÷ ${b} = ${resultado}`;
+        for(let i=0;i<=100;i++){ xValues.push(i/100); yValues.push(a); }
+        for(let i=100;i<=300;i++){ const p=(i-100)/200; xValues.push(i/100); yValues.push(a - (a-resultado)*p); }
+      }
+      chart.data.labels = xValues;
+      chart.data.datasets[0].data = yValues;
+      chart.data.datasets[0].label = titulo;
+      const colores = { suma:'#11a07a', resta:'#f06cfb', multiplicar:'#4facfe', dividir:'#fa709a' };
+      chart.data.datasets[0].borderColor = colores[tipo] || '#667eea';
+      chart.data.datasets[0].backgroundColor = 'rgba(102,126,234,0.08)';
+      chart.data.datasets[0].fill = true;
+      chart.update('active');
+    }
+
+    /* -------------------------------
+       Eventos: clicks y teclado
+       ------------------------------- */
+    function wireUI(){
+      // pad numérico
+      document.querySelectorAll('[data-num]').forEach(btn=>{
+        btn.addEventListener('click', ()=> agregarDigito(btn.getAttribute('data-num')));
+      });
+      document.getElementById('btnBack').addEventListener('click', borrarDigito);
+
+      // operaciones principales
+      document.getElementById('btnSuma').addEventListener('click', ()=> setOperacion('suma'));
+      document.getElementById('btnResta').addEventListener('click', ()=> setOperacion('resta'));
+      document.getElementById('btnMultiplicar').addEventListener('click', ()=> setOperacion('multiplicar'));
+      document.getElementById('btnDividir').addEventListener('click', ()=> setOperacion('dividir'));
+
+      // calcular / limpiar
+      document.getElementById('btnCalcular').addEventListener('click', calcular);
+      document.getElementById('btnLimpiar').addEventListener('click', limpiar);
+
+      // botones avanzados (unarios o que piden confirm)
+      document.querySelectorAll('[data-op]').forEach(b=>{
+        b.addEventListener('click', ()=>{
+          const op = b.getAttribute('data-op');
+          if(['seno','coseno','tangente','arcoseno','arcocoseno','arcotangente','factorial','absoluto','redondeo'].includes(op)){
+            operacionUnaria(op);
+          } else if(op === 'pi' || op === 'e'){ insertarConstante(op); }
+          else if(op === 'raiz') operacionUnaria('raiz');
+          else if(op === 'raizN') operacionUnaria('raizN');
+          else setOperacion(op);
+        });
+      });
+
+      // graficar
+      document.getElementById('btnGraficar').addEventListener('click', graficarFuncion);
+      document.querySelectorAll('.ejemplo').forEach(s=> s.addEventListener('click', ()=> graficarEjemplo(s.getAttribute('data-fn'))));
+
+      // language selector
+      document.getElementById('languageSelect').value = currentLang;
+      document.getElementById('languageSelect').addEventListener('change', (e)=>{
+        currentLang = e.target.value;
+        localStorage.setItem('calc_lang', currentLang);
+        applyTranslations();
+      });
+
+      // keyboard
+      document.addEventListener('keydown', function(e){
+        if(e.key >= '0' && e.key <= '9'){ agregarDigito(e.key); }
+        else if(e.key === '.') agregarDigito('.');
+        else if(e.key === 'Backspace') borrarDigito();
+        else if(e.key === 'Enter') { if(operacion !== null && primerNumero !== null) calcular(); }
+        else if(e.key === 'Escape') limpiar();
+        else if(e.key === '+') setOperacion('suma');
+        else if(e.key === '-') setOperacion('resta');
+        else if(e.key === '*') setOperacion('multiplicar');
+        else if(e.key === '/') { e.preventDefault(); setOperacion('dividir'); }
+      });
+
+      // permitir Enter en campo función
+      document.getElementById('funcionInput').addEventListener('keypress', function(e){ if(e.key==='Enter') graficarFuncion(); });
+    }
+
+    /* -------------------------------
+       Inicialización al cargar
+       ------------------------------- */
+    (function init(){
+      applyTranslations();
+      inicializarGrafica();
+      wireUI();
+      // graficar sin(x) por defecto
+      document.getElementById('funcionInput').value = 'sin(x)';
+      graficarFuncion();
+      actualizarDisplay();
+    })();
+
+    /* -------------------------------
+       Arreglos rápidos por si tu deploy perdió funciones:
+       1) Si no ves los botones: revisa que el HTML en GH Pages sea el mismo (index.html).
+       2) Si no funciona tema/idioma: comprueba que no hayamos incluido <script defer> duplicado o inline truncado.
+       3) Si algo falla, abre la consola (F12) y copia aquí el error.
+       ------------------------------- */
+  </script>
+</body>
+</html>
