@@ -1,10 +1,11 @@
-index.html
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Científica</title>
+    <title>Calculadora Científica con Gráficas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -14,587 +15,585 @@ index.html
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            gap: 20px;
+            max-width: 1400px;
             width: 100%;
+            height: 90vh;
         }
 
-        h1 {
-            text-align: center;
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 10px;
-            font-size: 36px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+        .calculadora-panel, .grafica-panel {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
-        .subtitle {
-            text-align: center;
-            color: #6b7280;
-            font-size: 16px;
-            margin-bottom: 25px;
-            font-weight: 400;
+        .calculadora-panel {
+            overflow-y: auto;
         }
 
-        .display {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 16px;
-            margin-bottom: 25px;
-            font-size: 28px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-weight: 600;
-            min-height: 80px;
-            word-wrap: break-word;
+        .grafica-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
             text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2em;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+            gap: 10px;
         }
 
-        .menu {
-            background: transparent;
-            border-radius: 10px;
-            padding: 0;
+        .header p {
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
             margin-bottom: 20px;
+            min-height: 60px;
+            font-size: 24px;
+            text-align: right;
+            word-wrap: break-word;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
-        .menu h3 {
-            color: #6366f1;
-            margin-bottom: 12px;
-            margin-top: 20px;
-            font-size: 15px;
-            font-weight: 600;
+        .operacion-actual {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 5px;
         }
 
-        .menu-grid {
+        .botones {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
+            gap: 10px;
             margin-bottom: 15px;
         }
 
-        .menu-btn {
-            background: white;
+        .boton {
+            padding: 15px;
             border: none;
-            color: #4b5563;
-            padding: 14px 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-            font-weight: 500;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .menu-btn:hover {
-            background: #f9fafb;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-        }
-
-        /* Botones de operaciones matemáticas con colores sólidos */
-        .calc-buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin: 20px 0;
-        }
-
-        .calc-btn {
-            padding: 18px;
-            border: none;
-            border-radius: 16px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: 700;
-            color: white;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .calc-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .calc-btn:active {
-            transform: translateY(-1px);
-        }
-
-        .btn-suma {
-            background: #4ade80;
-        }
-
-        .btn-suma:hover {
-            background: #22c55e;
-        }
-
-        .btn-resta {
-            background: #ff9500;
-        }
-
-        .btn-resta:hover {
-            background: #e68600;
-        }
-
-        .btn-multiplicar {
-            background: #3b82f6;
-        }
-
-        .btn-multiplicar:hover {
-            background: #2563eb;
-        }
-
-        .btn-dividir {
-            background: #ef4444;
-        }
-
-        .btn-dividir:hover {
-            background: #dc2626;
-        }
-
-        .btn-limpiar {
-            background: #9ca3af;
-            grid-column: 1 / -1;
-        }
-
-        .btn-limpiar:hover {
-            background: #6b7280;
-        }
-
-        /* Colores para botones de operaciones avanzadas */
-        .btn-modulo {
-            background: #fbbf24 !important;
-            color: white !important;
-        }
-
-        .btn-modulo:hover {
-            background: #f59e0b !important;
-        }
-
-        .btn-potencia, .btn-raiz, .btn-raiz-n {
-            background: #a78bfa !important;
-            color: white !important;
-        }
-
-        .btn-potencia:hover, .btn-raiz:hover, .btn-raiz-n:hover {
-            background: #8b5cf6 !important;
-        }
-
-        .btn-log, .btn-ln, .btn-log-custom {
-            background: #34d399 !important;
-            color: white !important;
-        }
-
-        .btn-log:hover, .btn-ln:hover, .btn-log-custom:hover {
-            background: #10b981 !important;
-        }
-
-        /* Colores para funciones trigonométricas */
-        .btn-sin, .btn-cos, .btn-tan, .btn-asin, .btn-acos, .btn-atan {
-            background: #60a5fa !important;
-            color: white !important;
-        }
-
-        .btn-sin:hover, .btn-cos:hover, .btn-tan:hover, 
-        .btn-asin:hover, .btn-acos:hover, .btn-atan:hover {
-            background: #3b82f6 !important;
-        }
-
-        /* Colores para otras funciones */
-        .btn-factorial, .btn-abs, .btn-round {
-            background: #f472b6 !important;
-            color: white !important;
-        }
-
-        .btn-factorial:hover, .btn-abs:hover, .btn-round:hover {
-            background: #ec4899 !important;
-        }
-
-        /* Colores para constantes */
-        .btn-pi, .btn-euler {
-            background: #fb7185 !important;
-            color: white !important;
-        }
-
-        .btn-pi:hover, .btn-euler:hover {
-            background: #f43f5e !important;
-        }
-
-        .input-section {
-            margin-bottom: 20px;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        input {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        button {
-            padding: 14px 28px;
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
+            border-radius: 10px;
             font-size: 16px;
             font-weight: 600;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
         }
 
-        button:hover {
+        .boton:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        button:active {
+        .boton:active {
             transform: translateY(0);
         }
 
-        .result {
-            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-            padding: 18px;
-            border-radius: 12px;
+        .suma { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .resta { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .multiplicar { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .dividir { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .limpiar { background: linear-gradient(135deg, #a8a8a8 0%, #7f7f7f 100%); }
+
+        .seccion {
+            margin-top: 20px;
+        }
+
+        .seccion-titulo {
+            color: #667eea;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .botones-avanzados {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .boton-avanzado {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .boton-avanzado:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modulo { background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); }
+        .potencia { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
+        .raiz { background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%); }
+        .raiz-n { background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); }
+        .logaritmo { background: linear-gradient(135deg, #0ba360 0%, #3cba92 100%); }
+        .ln { background: linear-gradient(135deg, #48c6ef 0%, #6f86d6 100%); }
+        .log-custom { background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%); }
+        .seno { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .coseno { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .tangente { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .arcoseno { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+        .arcocoseno { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+        .arcotangente { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+        .factorial { background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); }
+        .absoluto { background: linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%); }
+        .redondeo { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+        .pi { background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%); }
+        .euler { background: linear-gradient(135deg, #868f96 0%, #596164 100%); }
+
+        .grafica-header {
+            margin-bottom: 20px;
+        }
+
+        .grafica-header h2 {
+            color: #667eea;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .input-funcion {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-funcion input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-funcion input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .boton-graficar {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .boton-graficar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .ejemplos {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .ejemplos span {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 5px;
+            margin: 2px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .ejemplos span:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .historial {
             margin-top: 15px;
-            display: none;
-            border: 2px solid #6ee7b7;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            max-height: 150px;
+            overflow-y: auto;
         }
 
-        .result.show {
-            display: block;
+        .historial-titulo {
+            font-size: 12px;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 8px;
         }
 
-        .result strong {
-            color: #065f46;
+        .historial-item {
+            font-size: 13px;
+            color: #333;
+            padding: 5px;
+            border-bottom: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: background 0.3s;
         }
 
-        .emoji {
-            font-size: 24px;
-            margin-right: 10px;
+        .historial-item:hover {
+            background: white;
         }
 
         .footer {
             text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 2px solid #f3f4f6;
-            color: #6b7280;
-            font-size: 15px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
         }
 
-        .footer a {
-            color: #6366f1;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s;
+        @media (max-width: 1200px) {
+            .container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .grafica-panel {
+                min-height: 500px;
+            }
         }
 
-        .footer a:hover {
-            color: #8b5cf6;
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .made-with-love {
-            margin-bottom: 8px;
-            font-weight: 500;
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
         }
 
-        .abacus {
-            display: inline-block;
-            background: linear-gradient(to bottom, 
-                #ff0000 0%, #ff0000 14%,
-                #ff6600 14%, #ff6600 28%,
-                #ffcc00 28%, #ffcc00 42%,
-                #00cc66 42%, #00cc66 56%,
-                #0099ff 56%, #0099ff 70%,
-                #6633ff 70%, #6633ff 84%,
-                #cc0099 84%, #cc0099 100%
-            );
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 42px;
-            font-weight: bold;
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1><span class="abacus">🧮</span> Calculadora</h1>
-        <p class="subtitle">Simple y elegante</p>
-        
-        <div class="display" id="display">Selecciona una operación...</div>
+        <!-- Panel Calculadora -->
+        <div class="calculadora-panel">
+            <div class="header">
+                <h1>🧮 Calculadora</h1>
+                <p>Simple y elegante</p>
+            </div>
 
-        <div class="input-section" id="inputSection" style="display: none;">
-            <div class="input-group" id="input1Group">
-                <input type="number" id="input1" placeholder="Primer número" step="any">
+            <div class="display">
+                <div class="operacion-actual" id="operacionActual"></div>
+                <div id="display">0</div>
             </div>
-            <div class="input-group" id="input2Group" style="display: none;">
-                <input type="number" id="input2" placeholder="Segundo número" step="any">
+
+            <div class="botones">
+                <button class="boton suma" onclick="setOperacion('suma')">+ Suma</button>
+                <button class="boton resta" onclick="setOperacion('resta')">- Resta</button>
+                <button class="boton multiplicar" onclick="setOperacion('multiplicar')">× Multiplicar</button>
+                <button class="boton dividir" onclick="setOperacion('dividir')">/ Dividir</button>
             </div>
-            
-            <button onclick="calculate()" id="calcButton" style="display: none;">Calcular</button>
+
+            <button class="boton limpiar" onclick="limpiar()" style="width: 100%;">Limpiar</button>
+
+            <div class="seccion">
+                <div class="seccion-titulo">⚡ OPERACIONES AVANZADAS:</div>
+                <div class="botones-avanzados">
+                    <button class="boton-avanzado modulo" onclick="setOperacion('modulo')">5. Módulo (resto)</button>
+                    <button class="boton-avanzado potencia" onclick="setOperacion('potencia')">6. Potencia (a^b)</button>
+                    <button class="boton-avanzado raiz" onclick="operacionUnaria('raiz')">7. Raíz cuadrada</button>
+                    <button class="boton-avanzado raiz-n" onclick="operacionUnaria('raizN')">8. Raíz n-ésima</button>
+                    <button class="boton-avanzado logaritmo" onclick="operacionUnaria('log10')">9. Logaritmo (base 10)</button>
+                    <button class="boton-avanzado ln" onclick="operacionUnaria('ln')">10. Logaritmo natural (ln)</button>
+                    <button class="boton-avanzado log-custom" onclick="setOperacion('logCustom')">11. Log (base personalizada)</button>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">📐 FUNCIONES TRIGONOMÉTRICAS:</div>
+                <div class="botones-avanzados">
+                    <button class="boton-avanzado seno" onclick="operacionUnaria('seno')">12. Seno</button>
+                    <button class="boton-avanzado coseno" onclick="operacionUnaria('coseno')">13. Coseno</button>
+                    <button class="boton-avanzado tangente" onclick="operacionUnaria('tangente')">14. Tangente</button>
+                    <button class="boton-avanzado arcoseno" onclick="operacionUnaria('arcoseno')">15. Arcoseno</button>
+                    <button class="boton-avanzado arcocoseno" onclick="operacionUnaria('arcocoseno')">16. Arcocoseno</button>
+                    <button class="boton-avanzado arcotangente" onclick="operacionUnaria('arcotangente')">17. Arcotangente</button>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">🎯 OTRAS FUNCIONES:</div>
+                <div class="botones-avanzados">
+                    <button class="boton-avanzado factorial" onclick="operacionUnaria('factorial')">18. Factorial</button>
+                    <button class="boton-avanzado absoluto" onclick="operacionUnaria('absoluto')">19. Valor absoluto</button>
+                    <button class="boton-avanzado redondeo" onclick="operacionUnaria('redondeo')">20. Redondeo</button>
+                </div>
+            </div>
+
+            <div class="seccion">
+                <div class="seccion-titulo">⭐ CONSTANTES:</div>
+                <div class="botones-avanzados">
+                    <button class="boton-avanzado pi" onclick="insertarConstante('pi')">21. Mostrar π (pi)</button>
+                    <button class="boton-avanzado euler" onclick="insertarConstante('e')">22. Mostrar e (Euler)</button>
+                </div>
+            </div>
+
+            <div class="historial">
+                <div class="historial-titulo">📝 Historial</div>
+                <div id="historial"></div>
+            </div>
+
+            <div class="footer">
+                📱 ❤️ Hecho con amor por Pepe Gamboa<br>
+                Créditos: @losmonosco
+            </div>
         </div>
 
-        <!-- Botones de operaciones básicas con colores (siempre visibles en la parte superior) -->
-        <div class="calc-buttons">
-            <button class="calc-btn btn-suma" onclick="quickCalc('suma')">+ Suma</button>
-            <button class="calc-btn btn-resta" onclick="quickCalc('resta')">- Resta</button>
-            <button class="calc-btn btn-multiplicar" onclick="quickCalc('multiplicar')">x Multiplicar</button>
-            <button class="calc-btn btn-dividir" onclick="quickCalc('dividir')">/ Dividir</button>
-            <button class="calc-btn btn-limpiar" onclick="clearAll()">Limpiar</button>
-        </div>
-
-        <div class="menu">
-            <h3>⚡ OPERACIONES AVANZADAS:</h3>
-            <div class="menu-grid">
-                <button class="menu-btn btn-modulo" onclick="selectOperation(5)">5. Módulo (resto)</button>
-                <button class="menu-btn btn-potencia" onclick="selectOperation(6)">6. Potencia (a^b)</button>
-                <button class="menu-btn btn-raiz" onclick="selectOperation(7)">7. Raíz cuadrada</button>
-                <button class="menu-btn btn-raiz-n" onclick="selectOperation(8)">8. Raíz n-ésima</button>
-                <button class="menu-btn btn-log" onclick="selectOperation(9)">9. Logaritmo (base 10)</button>
-                <button class="menu-btn btn-ln" onclick="selectOperation(10)">10. Logaritmo natural (ln)</button>
-                <button class="menu-btn btn-log-custom" onclick="selectOperation(11)">11. Log (base personalizada)</button>
+        <!-- Panel Gráficas -->
+        <div class="grafica-panel">
+            <div class="grafica-header">
+                <h2>📊 Visualización Gráfica</h2>
+                <div class="input-funcion">
+                    <input type="text" id="funcionInput" placeholder="Escribe tu función, ej: sin(x), x^2, log(x)" />
+                    <button class="boton-graficar" onclick="graficarFuncion()">Graficar</button>
+                </div>
+                <div class="ejemplos">
+                    <strong>Ejemplos:</strong>
+                    <span onclick="graficarEjemplo('sin(x)')">sin(x)</span>
+                    <span onclick="graficarEjemplo('cos(x)')">cos(x)</span>
+                    <span onclick="graficarEjemplo('x^2')">x²</span>
+                    <span onclick="graficarEjemplo('x^3 - 2*x')">x³-2x</span>
+                    <span onclick="graficarEjemplo('log(x)')">log(x)</span>
+                    <span onclick="graficarEjemplo('sqrt(x)')">√x</span>
+                    <span onclick="graficarEjemplo('abs(x)')">|x|</span>
+                    <span onclick="graficarEjemplo('exp(x)')">eˣ</span>
+                </div>
             </div>
-            <h3>📊 FUNCIONES TRIGONOMÉTRICAS:</h3>
-            <div class="menu-grid">
-                <button class="menu-btn btn-sin" onclick="selectOperation(12)">12. Seno</button>
-                <button class="menu-btn btn-cos" onclick="selectOperation(13)">13. Coseno</button>
-                <button class="menu-btn btn-tan" onclick="selectOperation(14)">14. Tangente</button>
-                <button class="menu-btn btn-asin" onclick="selectOperation(15)">15. Arcoseno</button>
-                <button class="menu-btn btn-acos" onclick="selectOperation(16)">16. Arcocoseno</button>
-                <button class="menu-btn btn-atan" onclick="selectOperation(17)">17. Arcotangente</button>
+            <div class="canvas-container">
+                <canvas id="grafica"></canvas>
             </div>
-            <h3>🎯 OTRAS FUNCIONES:</h3>
-            <div class="menu-grid">
-                <button class="menu-btn btn-factorial" onclick="selectOperation(18)">18. Factorial</button>
-                <button class="menu-btn btn-abs" onclick="selectOperation(19)">19. Valor absoluto</button>
-                <button class="menu-btn btn-round" onclick="selectOperation(20)">20. Redondeo</button>
-            </div>
-
-            <h3>📌 CONSTANTES:</h3>
-            <div class="menu-grid">
-                <button class="menu-btn btn-pi" onclick="selectOperation(21)">21. Mostrar π (pi)</button>
-                <button class="menu-btn btn-euler" onclick="selectOperation(22)">22. Mostrar e (Euler)</button>
-            </div>
-        </div>
-
-        <div class="result" id="result"></div>
-
-        <div class="footer">
-            <div class="made-with-love">🧮 ❤️ Hecho con amor por <a href="https://github.com/PepeGamboa" target="_blank">Pepe Gamboa</a></div>
-            <div>Créditos: <a href="https://github.com/losmonosco" target="_blank">@losmonosco</a></div>
         </div>
     </div>
 
     <script>
-        let currentOperation = 0;
-        let operationSymbol = '';
-        let input1Value = '';
-        let input2Value = '';
-        let waitingForSecondNumber = false;
+        let valorActual = '0';
+        let operacion = null;
+        let primerNumero = null;
+        let historialArray = [];
+        let chart = null;
 
-        function quickCalc(operation) {
-            const display = document.getElementById('display');
-            const input1 = document.getElementById('input1');
-            const input2 = document.getElementById('input2');
-            
-            // Si no hay primer número, pedirlo
-            if (!input1Value && input1.value === '') {
-                display.textContent = 'Ingresa el primer número';
-                document.getElementById('inputSection').style.display = 'block';
-                document.getElementById('input1Group').style.display = 'flex';
-                document.getElementById('input2Group').style.display = 'none';
-                input1.placeholder = 'Ej: 15';
-                input1.focus();
-                waitingForSecondNumber = false;
-                currentOperation = operation;
-                return;
-            }
-            
-            // Capturar primer número
-            if (!input1Value) {
-                input1Value = parseFloat(input1.value);
-                if (isNaN(input1Value)) {
-                    display.textContent = 'Por favor ingresa un número válido';
-                    return;
-                }
-            }
-            
-            // Si ya tenemos el primer número pero no el segundo
-            if (!waitingForSecondNumber) {
-                display.textContent = 'Ingresa el segundo número';
-                document.getElementById('input2Group').style.display = 'flex';
-                input2.placeholder = 'Ej: 27';
-                input2.focus();
-                waitingForSecondNumber = true;
-                currentOperation = operation;
-                return;
-            }
-            
-            // Si ya tenemos ambos números, calcular
-            if (input2.value === '') {
-                display.textContent = 'Ingresa el segundo número';
-                input2.focus();
-                return;
-            }
-            
-            input2Value = parseFloat(input2.value);
-            if (isNaN(input2Value)) {
-                display.textContent = 'Por favor ingresa un número válido';
-                return;
-            }
-            
-            let result = 0;
-            let symbol = '';
-            
-            switch(operation) {
-                case 'suma': 
-                    result = input1Value + input2Value;
-                    symbol = '+';
-                    break;
-                case 'resta': 
-                    result = input1Value - input2Value;
-                    symbol = '-';
-                    break;
-                case 'multiplicar': 
-                    result = input1Value * input2Value;
-                    symbol = 'x';
-                    break;
-                case 'dividir': 
-                    if (input2Value === 0) {
-                        display.textContent = '⚠️ Error: No se puede dividir por cero';
-                        return;
-                    }
-                    result = input1Value / input2Value;
-                    symbol = '/';
-                    break;
-            }
-            
-            display.textContent = `${input1Value} ${symbol} ${input2Value} = ${result}`;
-            
-            // Resetear para próxima operación
-            input1Value = '';
-            input2Value = '';
-            waitingForSecondNumber = false;
-        }
-
-        function selectOperation(op) {
-            currentOperation = op;
-            const display = document.getElementById('display');
-            const inputSection = document.getElementById('inputSection');
-            const input1Group = document.getElementById('input1Group');
-            const input2Group = document.getElementById('input2Group');
-            const calcButton = document.getElementById('calcButton');
-            const result = document.getElementById('result');
-            
-            result.classList.remove('show');
-            document.getElementById('input1').value = '';
-            document.getElementById('input2').value = '';
-            input1Value = '';
-            input2Value = '';
-            waitingForSecondNumber = false;
-            
-            const operations = {
-                2: 'Resta',
-                3: 'Multiplicación',
-                4: 'División',
-                5: 'Módulo (resto)',
-                6: 'Potencia (a^b)',
-                7: 'Raíz cuadrada (√a)',
-                8: 'Raíz n-ésima (ⁿ√a)',
-                9: 'Logaritmo base 10 (log₁₀)',
-                10: 'Logaritmo natural (ln)',
-                11: 'Logaritmo base personalizada',
-                12: 'Seno (sin)',
-                13: 'Coseno (cos)',
-                14: 'Tangente (tan)',
-                15: 'Arcoseno (arcsin)',
-                16: 'Arcocoseno (arccos)',
-                17: 'Arcotangente (arctan)',
-                18: 'Factorial (n!)',
-                19: 'Valor absoluto (|a|)',
-                20: 'Redondeo',
-                21: 'Constante π (pi)',
-                22: 'Constante e (Euler)'
-            };
-
-            display.textContent = operations[op] || 'Operación seleccionada';
-            
-            // Operaciones que necesitan dos números
-            const twoInputOps = [5, 6, 8, 11];
-            
-            // Operaciones que no necesitan input
-            const noInputOps = [21, 22];
-            
-            if (noInputOps.includes(op)) {
-                inputSection.style.display = 'none';
-                calculate();
+        function actualizarDisplay() {
+            document.getElementById('display').textContent = valorActual;
+            if (operacion && primerNumero !== null) {
+                let simbolo = {
+                    'suma': '+',
+                    'resta': '-',
+                    'multiplicar': '×',
+                    'dividir': '÷',
+                    'potencia': '^',
+                    'modulo': 'mod',
+                    'logCustom': 'log'
+                }[operacion] || '';
+                document.getElementById('operacionActual').textContent = 
+                    `${primerNumero} ${simbolo}`;
             } else {
-                inputSection.style.display = 'block';
-                input1Group.style.display = 'flex';
-                calcButton.style.display = 'block';
-                
-                if (twoInputOps.includes(op)) {
-                    input2Group.style.display = 'flex';
-                    document.getElementById('input1').placeholder = op === 8 ? 'Radicando' : 'Primer número';
-                    document.getElementById('input2').placeholder = op === 8 ? 'Índice de la raíz' : 'Segundo número';
-                } else {
-                    input2Group.style.display = 'none';
-                    document.getElementById('input1').placeholder = 'Número';
-                }
+                document.getElementById('operacionActual').textContent = '';
             }
         }
 
-        function clearAll() {
-            document.getElementById('input1').value = '';
-            document.getElementById('input2').value = '';
-            document.getElementById('result').classList.remove('show');
-            document.getElementById('display').textContent = 'Selecciona una operación...';
-            document.getElementById('inputSection').style.display = 'none';
-            document.getElementById('input2Group').style.display = 'none';
-            currentOperation = 0;
-            operationSymbol = '';
-            input1Value = '';
-            input2Value = '';
-            waitingForSecondNumber = false;
+        function setOperacion(op) {
+            if (valorActual === '0' || valorActual === '') {
+                alert('Por favor ingresa un número primero');
+                return;
+            }
+            primerNumero = parseFloat(valorActual);
+            operacion = op;
+            valorActual = '0';
+            actualizarDisplay();
+            
+            let segundo = prompt('Ingresa el segundo número:');
+            if (segundo !== null && segundo !== '') {
+                valorActual = segundo;
+                calcular();
+            }
+        }
+
+        function calcular() {
+            if (primerNumero === null || operacion === null) return;
+            
+            let segundoNumero = parseFloat(valorActual);
+            let resultado;
+            let operacionTexto = '';
+
+            try {
+                switch(operacion) {
+                    case 'suma':
+                        resultado = primerNumero + segundoNumero;
+                        operacionTexto = `${primerNumero} + ${segundoNumero}`;
+                        break;
+                    case 'resta':
+                        resultado = primerNumero - segundoNumero;
+                        operacionTexto = `${primerNumero} - ${segundoNumero}`;
+                        break;
+                    case 'multiplicar':
+                        resultado = primerNumero * segundoNumero;
+                        operacionTexto = `${primerNumero} × ${segundoNumero}`;
+                        break;
+                    case 'dividir':
+                        if (segundoNumero === 0) throw new Error('No se puede dividir por cero');
+                        resultado = primerNumero / segundoNumero;
+                        operacionTexto = `${primerNumero} ÷ ${segundoNumero}`;
+                        break;
+                    case 'potencia':
+                        resultado = Math.pow(primerNumero, segundoNumero);
+                        operacionTexto = `${primerNumero}^${segundoNumero}`;
+                        break;
+                    case 'modulo':
+                        resultado = primerNumero % segundoNumero;
+                        operacionTexto = `${primerNumero} mod ${segundoNumero}`;
+                        break;
+                    case 'logCustom':
+                        resultado = Math.log(primerNumero) / Math.log(segundoNumero);
+                        operacionTexto = `log${segundoNumero}(${primerNumero})`;
+                        break;
+                }
+
+                valorActual = resultado.toString();
+                agregarHistorial(`${operacionTexto} = ${resultado}`);
+                actualizarDisplay();
+                
+                primerNumero = null;
+                operacion = null;
+            } catch(error) {
+                alert(error.message);
+                limpiar();
+            }
+        }
+
+        function operacionUnaria(tipo) {
+            let numero = prompt('Ingresa el número:');
+            if (numero === null || numero === '') return;
+            
+            numero = parseFloat(numero);
+            let resultado;
+            let operacionTexto = '';
+
+            try {
+                switch(tipo) {
+                    case 'raiz':
+                        if (numero < 0) throw new Error('No se puede calcular raíz de número negativo');
+                        resultado = Math.sqrt(numero);
+                        operacionTexto = `√${numero}`;
+                        break;
+                    case 'raizN':
+                        let n = prompt('¿Raíz de qué grado?');
+                        if (n === null || n === '') return;
+                        n = parseFloat(n);
+                        resultado = Math.pow(numero, 1/n);
+                        operacionTexto = `${n}√${numero}`;
+                        break;
+                    case 'log10':
+                        if (numero <= 0) throw new Error('Logaritmo solo para números positivos');
+                        resultado = Math.log10(numero);
+                        operacionTexto = `log(${numero})`;
+                        break;
+                    case 'ln':
+                        if (numero <= 0) throw new Error('Logaritmo solo para números positivos');
+                        resultado = Math.log(numero);
+                        operacionTexto = `ln(${numero})`;
+                        break;
+                    case 'seno':
+                        resultado = Math.sin(numero);
+                        operacionTexto = `sin(${numero})`;
+                        break;
+                    case 'coseno':
+                        resultado = Math.cos(numero);
+                        operacionTexto = `cos(${numero})`;
+                        break;
+                    case 'tangente':
+                        resultado = Math.tan(numero);
+                        operacionTexto = `tan(${numero})`;
+                        break;
+                    case 'arcoseno':
+                        if (numero < -1 || numero > 1) throw new Error('Arcoseno requiere valor entre -1 y 1');
+                        resultado = Math.asin(numero);
+                        operacionTexto = `arcsin(${numero})`;
+                        break;
+                    case 'arcocoseno':
+                        if (numero < -1 || numero > 1) throw new Error('Arcocoseno requiere valor entre -1 y 1');
+                        resultado = Math.acos(numero);
+                        operacionTexto = `arccos(${numero})`;
+                        break;
+                    case 'arcotangente':
+                        resultado = Math.atan(numero);
+                        operacionTexto = `arctan(${numero})`;
+                        break;
+                    case 'factorial':
+                        if (numero < 0 || numero % 1 !== 0) throw new Error('Factorial solo para enteros positivos');
+                        resultado = factorial(numero);
+                        operacionTexto = `${numero}!`;
+                        break;
+                    case 'absoluto':
+                        resultado = Math.abs(numero);
+                        operacionTexto = `|${numero}|`;
+                        break;
+                    case 'redondeo':
+                        resultado = Math.round(numero);
+                        operacionTexto = `round(${numero})`;
+                        break;
+                }
+
+                valorActual = resultado.toString();
+                agregarHistorial(`${operacionTexto} = ${resultado}`);
+                actualizarDisplay();
+            } catch(error) {
+                alert(error.message);
+            }
         }
 
         function factorial(n) {
-            if (n < 0) return 'Error: no existe factorial de números negativos';
             if (n === 0 || n === 1) return 1;
             let result = 1;
             for (let i = 2; i <= n; i++) {
@@ -603,123 +602,141 @@ index.html
             return result;
         }
 
-        function calculate() {
-            const input1 = parseFloat(document.getElementById('input1').value);
-            const input2 = parseFloat(document.getElementById('input2').value);
-            const resultDiv = document.getElementById('result');
-            let resultText = '';
-
-            try {
-                switch(currentOperation) {
-                    case 2:
-                        resultText = `<strong>Resultado:</strong> ${input1} - ${input2} = ${input1 - input2}`;
-                        break;
-                    case 3:
-                        resultText = `<strong>Resultado:</strong> ${input1} × ${input2} = ${input1 * input2}`;
-                        break;
-                    case 4:
-                        if (input2 === 0) {
-                            resultText = '<strong>Error:</strong> No se puede dividir por cero';
-                        } else {
-                            resultText = `<strong>Resultado:</strong> ${input1} ÷ ${input2} = ${input1 / input2}`;
-                        }
-                        break;
-                    case 5:
-                        resultText = `<strong>Resultado:</strong> ${input1} mod ${input2} = ${input1 % input2}`;
-                        break;
-                    case 6:
-                        resultText = `<strong>Resultado:</strong> ${input1}^${input2} = ${Math.pow(input1, input2)}`;
-                        break;
-                    case 7:
-                        if (input1 < 0) {
-                            resultText = '<strong>Error:</strong> No se puede calcular la raíz cuadrada de un número negativo';
-                        } else {
-                            resultText = `<strong>Resultado:</strong> √${input1} = ${Math.sqrt(input1)}`;
-                        }
-                        break;
-                    case 8:
-                        resultText = `<strong>Resultado:</strong> ${input2}√${input1} = ${Math.pow(input1, 1/input2)}`;
-                        break;
-                    case 9:
-                        if (input1 <= 0) {
-                            resultText = '<strong>Error:</strong> El logaritmo solo está definido para números positivos';
-                        } else {
-                            resultText = `<strong>Resultado:</strong> log₁₀(${input1}) = ${Math.log10(input1)}`;
-                        }
-                        break;
-                    case 10:
-                        if (input1 <= 0) {
-                            resultText = '<strong>Error:</strong> El logaritmo solo está definido para números positivos';
-                        } else {
-                            resultText = `<strong>Resultado:</strong> ln(${input1}) = ${Math.log(input1)}`;
-                        }
-                        break;
-                    case 11:
-                        if (input1 <= 0 || input2 <= 0 || input2 === 1) {
-                            resultText = '<strong>Error:</strong> Base y argumento deben ser positivos, y base ≠ 1';
-                        } else {
-                            resultText = `<strong>Resultado:</strong> log₍${input2}₎(${input1}) = ${Math.log(input1) / Math.log(input2)}`;
-                        }
-                        break;
-                    case 12:
-                        resultText = `<strong>Resultado:</strong> sin(${input1}°) = ${Math.sin(input1 * Math.PI / 180)}`;
-                        break;
-                    case 13:
-                        resultText = `<strong>Resultado:</strong> cos(${input1}°) = ${Math.cos(input1 * Math.PI / 180)}`;
-                        break;
-                    case 14:
-                        resultText = `<strong>Resultado:</strong> tan(${input1}°) = ${Math.tan(input1 * Math.PI / 180)}`;
-                        break;
-                    case 15:
-                        if (input1 < -1 || input1 > 1) {
-                            resultText = '<strong>Error:</strong> El arcoseno solo está definido para valores entre -1 y 1';
-                        } else {
-                            resultText = `<strong>Resultado:</strong> arcsin(${input1}) = ${(Math.asin(input1) * 180 / Math.PI)}°`;
-                        }
-                        break;
-                    case 16:
-                        if (input1 < -1 || input1 > 1) {
-                            resultText = '<strong>Error:</strong> El arcocoseno solo está definido para valores entre -1 y 1';
-                        } else {
-                            resultText = `<strong>Resultado:</strong> arccos(${input1}) = ${(Math.acos(input1) * 180 / Math.PI)}°`;
-                        }
-                        break;
-                    case 17:
-                        resultText = `<strong>Resultado:</strong> arctan(${input1}) = ${(Math.atan(input1) * 180 / Math.PI)}°`;
-                        break;
-                    case 18:
-                        const fact = factorial(Math.floor(input1));
-                        resultText = `<strong>Resultado:</strong> ${Math.floor(input1)}! = ${fact}`;
-                        break;
-                    case 19:
-                        resultText = `<strong>Resultado:</strong> |${input1}| = ${Math.abs(input1)}`;
-                        break;
-                    case 20:
-                        resultText = `<strong>Resultado:</strong> round(${input1}) = ${Math.round(input1)}`;
-                        break;
-                    case 21:
-                        resultText = `<strong>Constante π (pi):</strong> ${Math.PI}`;
-                        break;
-                    case 22:
-                        resultText = `<strong>Constante e (Euler):</strong> ${Math.E}`;
-                        break;
-                    default:
-                        resultText = 'Selecciona una operación válida';
-                }
-            } catch (error) {
-                resultText = `<strong>Error:</strong> ${error.message}`;
+        function insertarConstante(tipo) {
+            if (tipo === 'pi') {
+                valorActual = Math.PI.toString();
+                agregarHistorial(`π = ${Math.PI}`);
+            } else if (tipo === 'e') {
+                valorActual = Math.E.toString();
+                agregarHistorial(`e = ${Math.E}`);
             }
-
-            resultDiv.innerHTML = resultText;
-            resultDiv.classList.add('show');
+            actualizarDisplay();
         }
 
-        // Permitir calcular con Enter
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && currentOperation !== 0) {
-                calculate();
+        function limpiar() {
+            valorActual = '0';
+            operacion = null;
+            primerNumero = null;
+            actualizarDisplay();
+        }
+
+        function agregarHistorial(texto) {
+            historialArray.unshift(texto);
+            if (historialArray.length > 10) historialArray.pop();
+            
+            let historialDiv = document.getElementById('historial');
+            historialDiv.innerHTML = historialArray.map(item => 
+                `<div class="historial-item">${item}</div>`
+            ).join('');
+        }
+
+        // FUNCIONES DE GRÁFICAS
+        function inicializarGrafica() {
+            const ctx = document.getElementById('grafica').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'f(x)',
+                        data: [],
+                        borderColor: 'rgb(102, 126, 234)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                font: { size: 14 }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'x',
+                                font: { size: 16 }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'f(x)',
+                                font: { size: 16 }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function graficarFuncion() {
+            let funcion = document.getElementById('funcionInput').value;
+            if (!funcion) {
+                alert('Por favor escribe una función');
+                return;
             }
-        });
+
+            try {
+                // Convertir la función a sintaxis de Math.js
+                funcion = funcion.replace(/\^/g, '^');
+                funcion = funcion.replace(/log/g, 'log10');
+                
+                const xValues = [];
+                const yValues = [];
+                const paso = 0.1;
+                const rango = 20;
+
+                for (let x = -rango; x <= rango; x += paso) {
+                    try {
+                        const y = math.evaluate(funcion, { x: x });
+                        if (isFinite(y) && !isNaN(y)) {
+                            xValues.push(x.toFixed(2));
+                            yValues.push(y);
+                        }
+                    } catch(e) {
+                        continue;
+                    }
+                }
+
+                if (xValues.length === 0) {
+                    throw new Error('No se pudieron generar puntos válidos');
+                }
+
+                chart.data.labels = xValues;
+                chart.data.datasets[0].data = yValues;
+                chart.data.datasets[0].label = `f(x) = ${document.getElementById('funcionInput').value}`;
+                chart.update();
+                
+                agregarHistorial(`Graficada: ${document.getElementById('funcionInput').value}`);
+            } catch(error) {
+                alert('Error al graficar: ' + error.message + '\n\nVerifica la sintaxis de tu función');
+            }
+        }
+
+        function graficarEjemplo(funcion) {
+            document.getElementById('funcionInput').value = funcion;
+            graficarFuncion();
+        }
+
+        // Inicializar
+        actualizarDisplay();
+        inicializarGrafica();
+        graficarEjemplo('sin(x)');
     </script>
 </body>
 </html>
