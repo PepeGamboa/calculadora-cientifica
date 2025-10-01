@@ -1,1142 +1,227 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora Científica con Gráficas</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container {
-            display: grid;
-            grid-template-columns: 450px 1fr;
-            gap: 20px;
-            max-width: 1400px;
-            width: 100%;
-            height: 90vh;
-        }
-
-        .calculadora-panel, .grafica-panel {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .calculadora-panel {
-            overflow-y: auto;
-        }
-
-        .grafica-panel {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            color: #667eea;
-            font-size: 2em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .header p {
-            color: #666;
-            margin-top: 5px;
-        }
-
-        .display {
-            background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 20px;
-            margin-bottom: 20px;
-            min-height: 80px;
-            font-size: 24px;
-            text-align: right;
-            word-wrap: break-word;
-            box-shadow: 
-                0 8px 20px rgba(102, 126, 234, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -2px 0 rgba(0, 0, 0, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .display::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 50%;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
-            border-radius: 20px 20px 0 0;
-        }
-
-        .operacion-actual {
-            font-size: 14px;
-            opacity: 0.8;
-            margin-bottom: 5px;
-            min-height: 20px;
-        }
-
-        .input-numeros {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .btn-numero {
-            padding: 18px;
-            border: none;
-            border-radius: 18px;
-            font-size: 20px;
-            font-weight: 700;
-            cursor: pointer;
-            background: linear-gradient(145deg, #ffffff 0%, #e8ecf1 100%);
-            color: #333;
-            transition: all 0.2s ease;
-            box-shadow: 
-                0 6px 15px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.15);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-numero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 50%;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, transparent 100%);
-            border-radius: 18px 18px 0 0;
-        }
-
-        .btn-numero:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 10px 25px rgba(0, 0, 0, 0.25),
-                inset 0 1px 0 rgba(255, 255, 255, 0.8),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-numero:active {
-            transform: translateY(1px);
-            box-shadow: 
-                0 3px 8px rgba(0, 0, 0, 0.2),
-                inset 0 1px 3px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn-punto {
-            background: linear-gradient(145deg, #ffeb9a 0%, #fdc765 100%);
-            box-shadow: 
-                0 6px 15px rgba(253, 199, 101, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.6),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-borrar {
-            background: linear-gradient(145deg, #ff7675 0%, #d63031 100%);
-            color: white;
-            box-shadow: 
-                0 6px 15px rgba(214, 48, 49, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
-        }
-
-        .botones {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .boton {
-            padding: 18px;
-            border: none;
-            border-radius: 18px;
-            font-size: 17px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: white;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 
-                0 6px 18px rgba(0, 0, 0, 0.25),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
-        }
-        
-        .boton::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 50%;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, transparent 100%);
-            border-radius: 18px 18px 0 0;
-        }
-
-        .boton:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 10px 28px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
-        }
-
-        .boton:active {
-            transform: translateY(1px);
-            box-shadow: 
-                0 3px 10px rgba(0, 0, 0, 0.25),
-                inset 0 1px 3px rgba(0, 0, 0, 0.3);
-        }
-
-        .suma { 
-            background: linear-gradient(145deg, #11998e 0%, #38ef7d 100%);
-            box-shadow: 
-                0 6px 18px rgba(56, 239, 125, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
-        }
-        .resta { 
-            background: linear-gradient(145deg, #f093fb 0%, #f5576c 100%);
-            box-shadow: 
-                0 6px 18px rgba(245, 87, 108, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
-        }
-        .multiplicar { 
-            background: linear-gradient(145deg, #4facfe 0%, #00f2fe 100%);
-            box-shadow: 
-                0 6px 18px rgba(0, 242, 254, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
-        }
-        .dividir { 
-            background: linear-gradient(145deg, #fa709a 0%, #fee140 100%);
-            box-shadow: 
-                0 6px 18px rgba(254, 225, 64, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
-        }
-        .calcular { 
-            background: linear-gradient(145deg, #00c6ff 0%, #0072ff 100%);
-            box-shadow: 
-                0 8px 22px rgba(0, 114, 255, 0.5),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -4px 0 rgba(0, 0, 0, 0.25);
-            font-size: 19px;
-        }
-        .calcular:hover {
-            box-shadow: 
-                0 12px 30px rgba(0, 114, 255, 0.6),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -4px 0 rgba(0, 0, 0, 0.25);
-        }
-        .limpiar { 
-            background: linear-gradient(145deg, #a8a8a8 0%, #7f7f7f 100%);
-            box-shadow: 
-                0 6px 18px rgba(127, 127, 127, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
-        }
-
-        .seccion {
-            margin-top: 20px;
-        }
-
-        .seccion-titulo {
-            color: #667eea;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .botones-avanzados {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-
-        .boton-avanzado {
-            padding: 14px;
-            border: none;
-            border-radius: 16px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: white;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 
-                0 5px 15px rgba(0, 0, 0, 0.25),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
-        }
-        
-        .boton-avanzado::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 50%;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, transparent 100%);
-            border-radius: 16px 16px 0 0;
-        }
-
-        .boton-avanzado:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 8px 22px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
-        }
-
-        .boton-avanzado:active {
-            transform: translateY(1px);
-            box-shadow: 
-                0 2px 8px rgba(0, 0, 0, 0.25),
-                inset 0 1px 3px rgba(0, 0, 0, 0.3);
-        }
-
-        .modulo { background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); }
-        .potencia { background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); }
-        .raiz { background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%); }
-        .raiz-n { background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%); }
-        .logaritmo { background: linear-gradient(135deg, #0ba360 0%, #3cba92 100%); }
-        .ln { background: linear-gradient(135deg, #48c6ef 0%, #6f86d6 100%); }
-        .log-custom { background: linear-gradient(135deg, #f857a6 0%, #ff5858 100%); }
-        .seno { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-        .coseno { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-        .tangente { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
-        .arcoseno { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
-        .arcocoseno { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
-        .arcotangente { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
-        .factorial { background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); }
-        .absoluto { background: linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%); }
-        .redondeo { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
-        .pi { background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%); }
-        .euler { background: linear-gradient(135deg, #868f96 0%, #596164 100%); }
-
-        .grafica-header {
-            margin-bottom: 20px;
-        }
-
-        .grafica-header h2 {
-            color: #667eea;
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
-
-        .input-funcion {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .input-funcion input {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        .input-funcion input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .boton-graficar {
-            padding: 12px 25px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .boton-graficar:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .canvas-container {
-            flex: 1;
-            position: relative;
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-        }
-
-        .ejemplos {
-            font-size: 12px;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        .ejemplo-item {
-            display: inline-block;
-            margin: 4px 2px;
-        }
-
-        .ejemplo-titulo {
-            font-size: 10px;
-            color: #667eea;
-            font-weight: 600;
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        .ejemplos span {
-            display: inline-block;
-            background: #f0f0f0;
-            padding: 6px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .ejemplos span:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 3px 8px rgba(102, 126, 234, 0.3);
-        }
-
-        .historial {
-            margin-top: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-
-        .historial-titulo {
-            font-size: 12px;
-            color: #667eea;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .historial-item {
-            font-size: 13px;
-            color: #333;
-            padding: 5px;
-            border-bottom: 1px solid #e0e0e0;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .historial-item:hover {
-            background: white;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 12px;
-            color: #666;
-        }
-
-        @media (max-width: 1200px) {
-            .container {
-                grid-template-columns: 1fr;
-                height: auto;
-            }
-            
-            .grafica-panel {
-                min-height: 500px;
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #667eea;
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #764ba2;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Científica Multilenguaje</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.11.0/math.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+  <style>
+    /* === Estilos generales === */
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI',Tahoma,Verdana,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;padding:20px;display:flex;justify-content:center;align-items:center;transition:all 0.3s;}
+    :root{
+      --bg: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+      --panel-bg: #fff;
+      --text:#333;
+    }
+    body.dark{
+      --bg: linear-gradient(135deg,#1f1f1f 0%,#333 100%);
+      --panel-bg:#2a2a2a;
+      --text:#eee;
+    }
+    .container{display:grid;grid-template-columns:450px 1fr;gap:20px;max-width:1400px;width:100%;height:90vh;}
+    .calculadora-panel,.grafica-panel{background:var(--panel-bg);border-radius:20px;padding:30px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.3);transition:all 0.3s;}
+    .calculadora-panel{overflow-y:auto;}
+    .grafica-panel{display:flex;flex-direction:column;}
+    .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;}
+    .header h1{color:#667eea;font-size:1.6em;}
+    .controls{display:flex;gap:10px;}
+    .selector,.modo{padding:6px 10px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer;}
+    body.dark .selector, body.dark .modo{background:#444;color:#eee;border-color:#666;}
+    .display{background:linear-gradient(145deg,#667eea 0%,#764ba2 100%);color:white;padding:20px;border-radius:20px;
+      margin-bottom:20px;min-height:80px;font-size:24px;text-align:right;position:relative;overflow:hidden;}
+    .operacion-actual{font-size:14px;opacity:0.8;margin-bottom:5px;}
+    .input-numeros{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:15px;}
+    .btn-numero,.boton{padding:18px;border:none;border-radius:18px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+    .btn-numero{font-size:20px;background:#e8ecf1;box-shadow:0 6px 15px rgba(0,0,0,0.2);}
+    .btn-borrar{background:linear-gradient(145deg,#ff7675,#d63031);color:white;}
+    .botones{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:15px;}
+    .boton{font-size:17px;color:white;}
+    .suma{background:linear-gradient(145deg,#11998e,#38ef7d);}
+    .resta{background:linear-gradient(145deg,#f093fb,#f5576c);}
+    .multiplicar{background:linear-gradient(145deg,#4facfe,#00f2fe);}
+    .dividir{background:linear-gradient(145deg,#fa709a,#fee140);}
+    .calcular{background:linear-gradient(145deg,#00c6ff,#0072ff);font-size:19px;width:100%;margin-bottom:10px;}
+    .limpiar{background:linear-gradient(145deg,#a8a8a8,#7f7f7f);width:100%;}
+    .historial{margin-top:15px;padding:15px;background:#f8f9fa;border-radius:10px;max-height:150px;overflow-y:auto;}
+    body.dark .historial{background:#444;}
+    .historial-titulo{font-size:12px;color:#667eea;font-weight:600;margin-bottom:8px;}
+    .historial-item{font-size:13px;padding:5px;border-bottom:1px solid #e0e0e0;}
+    body.dark .historial-item{border-color:#666;}
+    .grafica-header{margin-bottom:20px;}
+    .grafica-header h2{color:#667eea;font-size:1.5em;margin-bottom:10px;}
+    .input-funcion{display:flex;gap:10px;margin-bottom:15px;}
+    .input-funcion input{flex:1;padding:12px;border:2px solid #e0e0e0;border-radius:10px;font-size:16px;}
+    body.dark .input-funcion input{background:#333;border-color:#666;color:#eee;}
+    .boton-graficar{padding:12px 25px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:10px;font-weight:600;}
+    .canvas-container{flex:1;background:#f8f9fa;border-radius:15px;padding:20px;}
+    body.dark .canvas-container{background:#333;}
+    .footer{text-align:center;margin-top:20px;font-size:12px;color:#666;}
+    body.dark .footer{color:#aaa;}
+    @media(max-width:1200px){.container{grid-template-columns:1fr;height:auto;}.grafica-panel{min-height:500px;}}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="calculadora-panel">
-            <div class="header">
-                <h1>🧮 Calculadora</h1>
-                <p>Simple y elegante</p>
-            </div>
-
-            <div class="display">
-                <div class="operacion-actual" id="operacionActual"></div>
-                <div id="display">0</div>
-            </div>
-
-            <div class="input-numeros">
-                <button class="btn-numero" onclick="agregarDigito('7')">7</button>
-                <button class="btn-numero" onclick="agregarDigito('8')">8</button>
-                <button class="btn-numero" onclick="agregarDigito('9')">9</button>
-                <button class="btn-numero" onclick="agregarDigito('4')">4</button>
-                <button class="btn-numero" onclick="agregarDigito('5')">5</button>
-                <button class="btn-numero" onclick="agregarDigito('6')">6</button>
-                <button class="btn-numero" onclick="agregarDigito('1')">1</button>
-                <button class="btn-numero" onclick="agregarDigito('2')">2</button>
-                <button class="btn-numero" onclick="agregarDigito('3')">3</button>
-                <button class="btn-numero" onclick="agregarDigito('0')">0</button>
-                <button class="btn-numero btn-punto" onclick="agregarDigito('.')">.</button>
-                <button class="btn-numero btn-borrar" onclick="borrarDigito()">⌫</button>
-            </div>
-
-            <div class="botones">
-                <button class="boton suma" onclick="setOperacion('suma')">+ Suma</button>
-                <button class="boton resta" onclick="setOperacion('resta')">- Resta</button>
-                <button class="boton multiplicar" onclick="setOperacion('multiplicar')">× Multiplicar</button>
-                <button class="boton dividir" onclick="setOperacion('dividir')">÷ Dividir</button>
-            </div>
-
-            <button class="boton calcular" onclick="calcular()" style="width: 100%; margin-bottom: 10px;">
-                ✓ Calcular / Enter
-            </button>
-            <button class="boton limpiar" onclick="limpiar()" style="width: 100%;">Limpiar Todo</button>
-
-            <div class="seccion">
-                <div class="seccion-titulo">⚡ OPERACIONES AVANZADAS:</div>
-                <div class="botones-avanzados">
-                    <button class="boton-avanzado modulo" onclick="setOperacion('modulo')">Módulo (resto)</button>
-                    <button class="boton-avanzado potencia" onclick="setOperacion('potencia')">Potencia (a^b)</button>
-                    <button class="boton-avanzado raiz" onclick="operacionUnaria('raiz')">Raíz cuadrada</button>
-                    <button class="boton-avanzado raiz-n" onclick="operacionUnaria('raizN')">Raíz n-ésima</button>
-                    <button class="boton-avanzado logaritmo" onclick="operacionUnaria('log10')">Logaritmo (base 10)</button>
-                    <button class="boton-avanzado ln" onclick="operacionUnaria('ln')">Logaritmo natural (ln)</button>
-                    <button class="boton-avanzado log-custom" onclick="setOperacion('logCustom')">Log (base personalizada)</button>
-                </div>
-            </div>
-
-            <div class="seccion">
-                <div class="seccion-titulo">📐 FUNCIONES TRIGONOMÉTRICAS:</div>
-                <div class="botones-avanzados">
-                    <button class="boton-avanzado seno" onclick="operacionUnaria('seno')">Seno</button>
-                    <button class="boton-avanzado coseno" onclick="operacionUnaria('coseno')">Coseno</button>
-                    <button class="boton-avanzado tangente" onclick="operacionUnaria('tangente')">Tangente</button>
-                    <button class="boton-avanzado arcoseno" onclick="operacionUnaria('arcoseno')">Arcoseno</button>
-                    <button class="boton-avanzado arcocoseno" onclick="operacionUnaria('arcocoseno')">Arcocoseno</button>
-                    <button class="boton-avanzado arcotangente" onclick="operacionUnaria('arcotangente')">Arcotangente</button>
-                </div>
-            </div>
-
-            <div class="seccion">
-                <div class="seccion-titulo">🎯 OTRAS FUNCIONES:</div>
-                <div class="botones-avanzados">
-                    <button class="boton-avanzado factorial" onclick="operacionUnaria('factorial')">Factorial</button>
-                    <button class="boton-avanzado absoluto" onclick="operacionUnaria('absoluto')">Valor absoluto</button>
-                    <button class="boton-avanzado redondeo" onclick="operacionUnaria('redondeo')">Redondeo</button>
-                </div>
-            </div>
-
-            <div class="seccion">
-                <div class="seccion-titulo">⭐ CONSTANTES:</div>
-                <div class="botones-avanzados">
-                    <button class="boton-avanzado pi" onclick="insertarConstante('pi')">Mostrar π (pi)</button>
-                    <button class="boton-avanzado euler" onclick="insertarConstante('e')">Mostrar e (Euler)</button>
-                </div>
-            </div>
-
-            <div class="historial">
-                <div class="historial-titulo">📝 Historial</div>
-                <div id="historial"></div>
-            </div>
-
-            <div class="footer">
-                📱 ❤️ Hecho con amor por Pepe Gamboa<br>
-                Créditos: @losmonosco
-            </div>
+  <div class="container">
+    <!-- Panel calculadora -->
+    <div class="calculadora-panel">
+      <div class="header">
+        <h1 id="title">🧮 Calculadora</h1>
+        <div class="controls">
+          <select id="lang" class="selector" onchange="cambiarIdioma(this.value)">
+            <option value="es">ESP</option>
+            <option value="en">ENG</option>
+            <option value="fr">FRA</option>
+            <option value="de">GER</option>
+          </select>
+          <button class="modo" onclick="toggleModo()">🌙/☀️</button>
         </div>
+      </div>
 
-        <div class="grafica-panel">
-            <div class="grafica-header">
-                <h2>📊 Visualización Gráfica</h2>
-                <div class="input-funcion">
-                    <input type="text" id="funcionInput" placeholder="Escribe tu función, ej: sin(x), x^2, log(x)" />
-                    <button class="boton-graficar" onclick="graficarFuncion()">Graficar</button>
-                </div>
-                <div class="ejemplos">
-                    <strong>Ejemplos de funciones:</strong><br>
-                    <div class="ejemplo-item">
-                        <span class="ejemplo-titulo">Función Seno</span>
-                        <span onclick="graficarEjemplo('sin(x)')">sin(x)</span>
-                    </div>
-                    <div class="ejemplo-item">
-                        <span class="ejemplo-titulo">Función Coseno</span>
-                        <span onclick="graficarEjemplo('cos(x)')">cos(x)</span>
-                    </div>
-                    <div class="ejemplo-item">
-                        <span class="ejemplo-titulo">Parábola</span>
-                        <span onclick="graficarEjemplo('x^2')">x²</span>
-                    </div>
-                    <div class="ejemplo-item">
-                        <span class="ejemplo-titulo">Cúbica</span>
-                        <span onclick="graficarEjemplo('x^3 - 2*x')">x³-2x</span>
-                    </div>
-                    <div class="ejemplo-item">
-                        <span class="ejemplo-titulo">Logaritmo</span>
-                        <span onclick="graficarEjemplo('log10(x)')">log(x)</span>
-                    </div>
-                    <div class="ejemplo-item">
-                        <span class="ejemplo-titulo">Raíz Cuadrada</span>
-                        <span onclick="graficarEjemplo('sqrt(x)')">√x</span>
-                    </div>
-                    <div class="ejemplo-item">
-                        <span class="ejemplo-titulo">Valor Absoluto</span>
-                        <span onclick="graficarEjemplo('abs(x)')">|x|</span>
-                    </div>
-                    <div class="ejemplo-item">
-                        <span class="ejemplo-titulo">Exponencial</span>
-                        <span onclick="graficarEjemplo('exp(x)')">eˣ</span>
-                    </div>
-                </div>
-            </div>
-            <div class="canvas-container">
-                <canvas id="grafica"></canvas>
-            </div>
-        </div>
+      <div class="display"><div class="operacion-actual" id="operacionActual"></div><div id="display">0</div></div>
+
+      <!-- Botones numéricos -->
+      <div class="input-numeros">
+        <button class="btn-numero" onclick="agregarDigito('7')">7</button>
+        <button class="btn-numero" onclick="agregarDigito('8')">8</button>
+        <button class="btn-numero" onclick="agregarDigito('9')">9</button>
+        <button class="btn-numero" onclick="agregarDigito('4')">4</button>
+        <button class="btn-numero" onclick="agregarDigito('5')">5</button>
+        <button class="btn-numero" onclick="agregarDigito('6')">6</button>
+        <button class="btn-numero" onclick="agregarDigito('1')">1</button>
+        <button class="btn-numero" onclick="agregarDigito('2')">2</button>
+        <button class="btn-numero" onclick="agregarDigito('3')">3</button>
+        <button class="btn-numero" onclick="agregarDigito('0')">0</button>
+        <button class="btn-numero" onclick="agregarDigito('.')">.</button>
+        <button class="btn-numero btn-borrar" onclick="borrarDigito()">⌫</button>
+      </div>
+
+      <!-- Operaciones -->
+      <div class="botones">
+        <button class="boton suma" onclick="setOperacion('suma')" id="btnSuma">+ Suma</button>
+        <button class="boton resta" onclick="setOperacion('resta')" id="btnResta">- Resta</button>
+        <button class="boton multiplicar" onclick="setOperacion('multiplicar')" id="btnMulti">× Multiplicar</button>
+        <button class="boton dividir" onclick="setOperacion('dividir')" id="btnDiv">÷ Dividir</button>
+      </div>
+      <button class="boton calcular" onclick="calcular()" id="btnCalc">✓ Calcular / Enter</button>
+      <button class="boton limpiar" onclick="limpiar()" id="btnClear">Limpiar Todo</button>
+
+      <div class="historial">
+        <div class="historial-titulo" id="historyTitle">📝 Historial</div>
+        <div id="historial"></div>
+      </div>
+      <div class="footer" id="footer">📱 ❤️ Hecho con amor por Pepe Gamboa</div>
     </div>
 
-    <script>
-        let valorActual = '0';
-        let operacion = null;
-        let primerNumero = null;
-        let historialArray = [];
-        let chart = null;
-        let nuevoNumero = true;
+    <!-- Panel gráfica -->
+    <div class="grafica-panel">
+      <div class="grafica-header">
+        <h2 id="graphTitle">📊 Visualización Gráfica</h2>
+        <div class="input-funcion">
+          <input type="text" id="funcionInput" placeholder="Ej: sin(x), x^2, log(x)">
+          <button class="boton-graficar" onclick="graficarFuncion()" id="btnGraph">Graficar</button>
+        </div>
+      </div>
+      <div class="canvas-container"><canvas id="grafica"></canvas></div>
+    </div>
+  </div>
 
-        function actualizarDisplay() {
-            document.getElementById('display').textContent = valorActual;
-            if (operacion && primerNumero !== null) {
-                let simbolo = {
-                    'suma': '+',
-                    'resta': '-',
-                    'multiplicar': '×',
-                    'dividir': '÷',
-                    'potencia': '^',
-                    'modulo': 'mod',
-                    'logCustom': 'log'
-                }[operacion] || '';
-                document.getElementById('operacionActual').textContent = 
-                    `${primerNumero} ${simbolo}`;
-            } else {
-                document.getElementById('operacionActual').textContent = '';
-            }
-        }
+<script>
+/* === Variables y estado === */
+let valorActual='0', operacion=null, primerNumero=null, historialArray=[], chart=null, nuevoNumero=true;
 
-        function agregarDigito(digito) {
-            if (nuevoNumero) {
-                valorActual = digito === '.' ? '0.' : digito;
-                nuevoNumero = false;
-            } else {
-                if (digito === '.' && valorActual.includes('.')) return;
-                valorActual = valorActual === '0' && digito !== '.' ? digito : valorActual + digito;
-            }
-            actualizarDisplay();
-        }
+/* === Multilenguaje === */
+const textos={
+  es:{title:"🧮 Calculadora",btnSuma:"+ Suma",btnResta:"- Resta",btnMulti:"× Multiplicar",btnDiv:"÷ Dividir",
+      btnCalc:"✓ Calcular / Enter",btnClear:"Limpiar Todo",historyTitle:"📝 Historial",footer:"📱 ❤️ Hecho con amor por Pepe Gamboa",
+      graphTitle:"📊 Visualización Gráfica",btnGraph:"Graficar"},
+  en:{title:"🧮 Calculator",btnSuma:"+ Add",btnResta:"- Subtract",btnMulti:"× Multiply",btnDiv:"÷ Divide",
+      btnCalc:"✓ Calculate / Enter",btnClear:"Clear All",historyTitle:"📝 History",footer:"📱 ❤️ Made with love by Pepe Gamboa",
+      graphTitle:"📊 Graph Visualization",btnGraph:"Plot"},
+  fr:{title:"🧮 Calculatrice",btnSuma:"+ Addition",btnResta:"- Soustraction",btnMulti:"× Multiplication",btnDiv:"÷ Division",
+      btnCalc:"✓ Calculer / Entrée",btnClear:"Effacer Tout",historyTitle:"📝 Historique",footer:"📱 ❤️ Fait avec amour par Pepe Gamboa",
+      graphTitle:"📊 Visualisation Graphique",btnGraph:"Tracer"},
+  de:{title:"🧮 Rechner",btnSuma:"+ Addieren",btnResta:"- Subtrahieren",btnMulti:"× Multiplizieren",btnDiv:"÷ Dividieren",
+      btnCalc:"✓ Berechnen / Eingabe",btnClear:"Alles Löschen",historyTitle:"📝 Verlauf",footer:"📱 ❤️ Mit Liebe gemacht von Pepe Gamboa",
+      graphTitle:"📊 Grafische Darstellung",btnGraph:"Zeichnen"}
+};
+function cambiarIdioma(lang){
+  const t=textos[lang];
+  document.getElementById('title').textContent=t.title;
+  document.getElementById('btnSuma').textContent=t.btnSuma;
+  document.getElementById('btnResta').textContent=t.btnResta;
+  document.getElementById('btnMulti').textContent=t.btnMulti;
+  document.getElementById('btnDiv').textContent=t.btnDiv;
+  document.getElementById('btnCalc').textContent=t.btnCalc;
+  document.getElementById('btnClear').textContent=t.btnClear;
+  document.getElementById('historyTitle').textContent=t.historyTitle;
+  document.getElementById('footer').textContent=t.footer;
+  document.getElementById('graphTitle').textContent=t.graphTitle;
+  document.getElementById('btnGraph').textContent=t.btnGraph;
+}
 
-        function borrarDigito() {
-            if (valorActual.length > 1) {
-                valorActual = valorActual.slice(0, -1);
-            } else {
-                valorActual = '0';
-            }
-            actualizarDisplay();
-        }
+/* === Modo oscuro === */
+function toggleModo(){document.body.classList.toggle('dark');}
 
-        function setOperacion(op) {
-            if (valorActual === '' || valorActual === '.') {
-                alert('Por favor ingresa un número válido primero');
-                return;
-            }
+/* === Funcionalidad calculadora === */
+function actualizarDisplay(){
+  document.getElementById('display').textContent=valorActual;
+  document.getElementById('operacionActual').textContent=(operacion&&primerNumero!==null)? `${primerNumero} ${operacion}`:'';
+}
+function agregarDigito(d){if(nuevoNumero){valorActual=(d==='.')?'0.':d;nuevoNumero=false;}else{if(d==='.'&&valorActual.includes('.'))return;valorActual+=d;}actualizarDisplay();}
+function borrarDigito(){valorActual=(valorActual.length>1)?valorActual.slice(0,-1):'0';actualizarDisplay();}
+function setOperacion(op){primerNumero=parseFloat(valorActual);operacion=op;nuevoNumero=true;actualizarDisplay();}
+function limpiar(){valorActual='0';operacion=null;primerNumero=null;nuevoNumero=true;actualizarDisplay();}
+function agregarHistorial(txt){historialArray.unshift(txt);if(historialArray.length>10)historialArray.pop();
+  document.getElementById('historial').innerHTML=historialArray.map(i=>`<div class="historial-item">${i}</div>`).join('');}
+function calcular(){
+  if(primerNumero===null||operacion===null)return;
+  let segundoNumero=parseFloat(valorActual), resultado;
+  try{
+    switch(operacion){
+      case 'suma':resultado=primerNumero+segundoNumero;visualizarOperacion('suma',primerNumero,segundoNumero,resultado);break;
+      case 'resta':resultado=primerNumero-segundoNumero;visualizarOperacion('resta',primerNumero,segundoNumero,resultado);break;
+      case 'multiplicar':resultado=primerNumero*segundoNumero;visualizarOperacion('multiplicar',primerNumero,segundoNumero,resultado);break;
+      case 'dividir':if(segundoNumero===0)throw new Error("No se puede dividir por cero");resultado=primerNumero/segundoNumero;visualizarOperacion('dividir',primerNumero,segundoNumero,resultado);break;
+    }
+    valorActual=resultado.toString();agregarHistorial(`${primerNumero} ${operacion} ${segundoNumero} = ${valorActual}`);
+    primerNumero=null;operacion=null;nuevoNumero=true;actualizarDisplay();
+  }catch(e){alert(e.message);limpiar();}
+}
 
-            if (primerNumero !== null && operacion !== null && !nuevoNumero) {
-                calcular();
-            }
+/* === Gráfica === */
+function inicializarGrafica(){
+  chart=new Chart(document.getElementById('grafica').getContext('2d'),{
+    type:'line',
+    data:{labels:[],datasets:[{label:'f(x)',data:[],borderColor:'rgb(102,126,234)',backgroundColor:'rgba(102,126,234,0.1)',tension:0.3,borderWidth:3,pointRadius:0}]},
+    options:{responsive:true,maintainAspectRatio:false}
+  });
+}
+function graficarFuncion(){
+  let f=document.getElementById('funcionInput').value.trim();if(!f)return alert("Escribe una función");
+  let x=[],y=[];for(let i=-10;i<=10;i+=0.1){try{y.push(math.evaluate(f,{x:i}));x.push(i);}catch(e){}}
+  chart.data.labels=x;chart.data.datasets[0].data=y;chart.data.datasets[0].label=`f(x)=${f}`;chart.update();
+}
+function visualizarOperacion(tipo,a,b,res){
+  let x=[],y=[],titulo='',colores={
+    suma:{c:'rgb(17,153,142)',bg:'rgba(17,153,142,0.2)'},
+    resta:{c:'rgb(240,147,251)',bg:'rgba(240,147,251,0.2)'},
+    multiplicar:{c:'rgb(79,172,254)',bg:'rgba(79,172,254,0.2)'},
+    dividir:{c:'rgb(250,112,154)',bg:'rgba(250,112,154,0.2)'}
+  };
+  if(tipo==='suma'){titulo=`${a}+${b}=${res}`;x=[0,1,2];y=[0,a,res];}
+  if(tipo==='resta'){titulo=`${a}-${b}=${res}`;x=[0,1,2];y=[0,a,res];}
+  if(tipo==='multiplicar'){titulo=`${a}×${b}=${res}`;for(let i=0;i<=1;i+=0.05){x.push(i);y.push(res*i);} }
+  if(tipo==='dividir'){titulo=`${a}÷${b}=${res}`;for(let i=0;i<=1;i+=0.05){x.push(i);y.push(a-(a-res)*i);} }
+  chart.data.labels=x;chart.data.datasets[0].data=y;chart.data.datasets[0].label=titulo;
+  chart.data.datasets[0].borderColor=colores[tipo].c;chart.data.datasets[0].backgroundColor=colores[tipo].bg;chart.update();
+}
 
-            primerNumero = parseFloat(valorActual);
-            operacion = op;
-            nuevoNumero = true;
-            actualizarDisplay();
-        }
-
-        function calcular() {
-            if (primerNumero === null || operacion === null) return;
-            
-            let segundoNumero = parseFloat(valorActual);
-            let resultado;
-            let operacionTexto = '';
-
-            try {
-                switch(operacion) {
-                    case 'suma':
-                        resultado = primerNumero + segundoNumero;
-                        operacionTexto = `${primerNumero} + ${segundoNumero}`;
-                        visualizarOperacion('suma', primerNumero, segundoNumero, resultado);
-                        break;
-                    case 'resta':
-                        resultado = primerNumero - segundoNumero;
-                        operacionTexto = `${primerNumero} - ${segundoNumero}`;
-                        visualizarOperacion('resta', primerNumero, segundoNumero, resultado);
-                        break;
-                    case 'multiplicar':
-                        resultado = primerNumero * segundoNumero;
-                        operacionTexto = `${primerNumero} × ${segundoNumero}`;
-                        visualizarOperacion('multiplicar', primerNumero, segundoNumero, resultado);
-                        break;
-                    case 'dividir':
-                        if (segundoNumero === 0) throw new Error('No se puede dividir por cero');
-                        resultado = primerNumero / segundoNumero;
-                        operacionTexto = `${primerNumero} ÷ ${segundoNumero}`;
-                        visualizarOperacion('dividir', primerNumero, segundoNumero, resultado);
-                        break;
-                    case 'potencia':
-                        resultado = Math.pow(primerNumero, segundoNumero);
-                        operacionTexto = `${primerNumero}^${segundoNumero}`;
-                        break;
-                    case 'modulo':
-                        resultado = primerNumero % segundoNumero;
-                        operacionTexto = `${primerNumero} mod ${segundoNumero}`;
-                        break;
-                    case 'logCustom':
-                        if (primerNumero <= 0 || segundoNumero <= 0) {
-                            throw new Error('Logaritmo solo para números positivos');
-                        }
-                        resultado = Math.log(primerNumero) / Math.log(segundoNumero);
-                        operacionTexto = `log${segundoNumero}(${primerNumero})`;
-                        break;
-                }
-
-                valorActual = resultado.toFixed(10).replace(/\.?0+$/, '');
-                agregarHistorial(`${operacionTexto} = ${valorActual}`);
-                actualizarDisplay();
-                
-                primerNumero = null;
-                operacion = null;
-                nuevoNumero = true;
-            } catch(error) {
-                alert(error.message);
-                limpiar();
-            }
-        }
-
-        function operacionUnaria(tipo) {
-            let numero = parseFloat(valorActual);
-            if (isNaN(numero)) {
-                alert('Por favor ingresa un número válido');
-                return;
-            }
-            
-            let resultado;
-            let operacionTexto = '';
-
-            try {
-                switch(tipo) {
-                    case 'raiz':
-                        if (numero < 0) throw new Error('No se puede calcular raíz de número negativo');
-                        resultado = Math.sqrt(numero);
-                        operacionTexto = `√${numero}`;
-                        break;
-                    case 'raizN':
-                        let n = prompt('¿Raíz de qué grado?');
-                        if (n === null || n === '') return;
-                        n = parseFloat(n);
-                        if (isNaN(n)) throw new Error('Grado de raíz inválido');
-                        resultado = Math.pow(numero, 1/n);
-                        operacionTexto = `${n}√${numero}`;
-                        break;
-                    case 'log10':
-                        if (numero <= 0) throw new Error('Logaritmo solo para números positivos');
-                        resultado = Math.log10(numero);
-                        operacionTexto = `log(${numero})`;
-                        break;
-                    case 'ln':
-                        if (numero <= 0) throw new Error('Logaritmo solo para números positivos');
-                        resultado = Math.log(numero);
-                        operacionTexto = `ln(${numero})`;
-                        break;
-                    case 'seno':
-                        resultado = Math.sin(numero);
-                        operacionTexto = `sin(${numero})`;
-                        break;
-                    case 'coseno':
-                        resultado = Math.cos(numero);
-                        operacionTexto = `cos(${numero})`;
-                        break;
-                    case 'tangente':
-                        resultado = Math.tan(numero);
-                        operacionTexto = `tan(${numero})`;
-                        break;
-                    case 'arcoseno':
-                        if (numero < -1 || numero > 1) throw new Error('Arcoseno requiere valor entre -1 y 1');
-                        resultado = Math.asin(numero);
-                        operacionTexto = `arcsin(${numero})`;
-                        break;
-                    case 'arcocoseno':
-                        if (numero < -1 || numero > 1) throw new Error('Arcocoseno requiere valor entre -1 y 1');
-                        resultado = Math.acos(numero);
-                        operacionTexto = `arccos(${numero})`;
-                        break;
-                    case 'arcotangente':
-                        resultado = Math.atan(numero);
-                        operacionTexto = `arctan(${numero})`;
-                        break;
-                    case 'factorial':
-                        if (numero < 0 || numero % 1 !== 0) throw new Error('Factorial solo para enteros positivos');
-                        if (numero > 170) throw new Error('Número demasiado grande para factorial');
-                        resultado = factorial(numero);
-                        operacionTexto = `${numero}!`;
-                        break;
-                    case 'absoluto':
-                        resultado = Math.abs(numero);
-                        operacionTexto = `|${numero}|`;
-                        break;
-                    case 'redondeo':
-                        resultado = Math.round(numero);
-                        operacionTexto = `round(${numero})`;
-                        break;
-                }
-
-                valorActual = resultado.toFixed(10).replace(/\.?0+$/, '');
-                agregarHistorial(`${operacionTexto} = ${valorActual}`);
-                nuevoNumero = true;
-                actualizarDisplay();
-            } catch(error) {
-                alert(error.message);
-            }
-        }
-
-        function factorial(n) {
-            if (n === 0 || n === 1) return 1;
-            let result = 1;
-            for (let i = 2; i <= n; i++) {
-                result *= i;
-            }
-            return result;
-        }
-
-        function insertarConstante(tipo) {
-            if (tipo === 'pi') {
-                valorActual = Math.PI.toFixed(10).replace(/\.?0+$/, '');
-                agregarHistorial(`π = ${valorActual}`);
-            } else if (tipo === 'e') {
-                valorActual = Math.E.toFixed(10).replace(/\.?0+$/, '');
-                agregarHistorial(`e = ${valorActual}`);
-            }
-            nuevoNumero = true;
-            actualizarDisplay();
-        }
-
-        function limpiar() {
-            valorActual = '0';
-            operacion = null;
-            primerNumero = null;
-            nuevoNumero = true;
-            actualizarDisplay();
-        }
-
-        function agregarHistorial(texto) {
-            historialArray.unshift(texto);
-            if (historialArray.length > 10) historialArray.pop();
-            
-            let historialDiv = document.getElementById('historial');
-            historialDiv.innerHTML = historialArray.map(item => 
-                `<div class="historial-item">${item}</div>`
-            ).join('');
-        }
-
-        function inicializarGrafica() {
-            const ctx = document.getElementById('grafica').getContext('2d');
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{
-                        label: 'f(x)',
-                        data: [],
-                        borderColor: 'rgb(102, 126, 234)',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        tension: 0.4,
-                        borderWidth: 3,
-                        pointRadius: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            labels: {
-                                font: { size: 14 }
-                            }
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'x',
-                                font: { size: 16, weight: 'bold' }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'f(x)',
-                                font: { size: 16, weight: 'bold' }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
-                            }
-                        }
-                    },
-                    interaction: {
-                        mode: 'nearest',
-                        axis: 'x',
-                        intersect: false
-                    }
-                }
-            });
-        }
-
-        function graficarFuncion() {
-            let funcion = document.getElementById('funcionInput').value.trim();
-            if (!funcion) {
-                alert('Por favor escribe una función');
-                return;
-            }
-
-            try {
-                let funcionProcesada = funcion
-                    .replace(/\^/g, '^')
-                    .replace(/log\(/g, 'log10(');
-                
-                const xValues = [];
-                const yValues = [];
-                const paso = 0.05;
-                const rango = 10;
-
-                for (let x = -rango; x <= rango; x += paso) {
-                    try {
-                        const y = math.evaluate(funcionProcesada, { x: x });
-                        if (isFinite(y) && !isNaN(y) && Math.abs(y) < 1e6) {
-                            xValues.push(parseFloat(x.toFixed(2)));
-                            yValues.push(y);
-                        }
-                    } catch(e) {
-                        continue;
-                    }
-                }
-
-                if (xValues.length === 0) {
-                    throw new Error('No se pudieron generar puntos válidos para esta función');
-                }
-
-                chart.data.labels = xValues;
-                chart.data.datasets[0].data = yValues;
-                chart.data.datasets[0].label = `f(x) = ${funcion}`;
-                chart.data.datasets[0].borderColor = 'rgb(102, 126, 234)';
-                chart.data.datasets[0].backgroundColor = 'rgba(102, 126, 234, 0.1)';
-                chart.data.datasets[0].fill = false;
-                chart.data.datasets[0].borderWidth = 3;
-                chart.update();
-                
-                agregarHistorial(`Graficada: ${funcion}`);
-            } catch(error) {
-                alert('Error al graficar la función:\n' + error.message + '\n\nVerifica la sintaxis. Ejemplos:\n- sin(x), cos(x), tan(x)\n- x^2, x^3\n- log10(x), log(x)\n- sqrt(x)\n- abs(x)\n- exp(x)');
-            }
-        }
-
-        function graficarEjemplo(funcion) {
-            document.getElementById('funcionInput').value = funcion;
-            graficarFuncion();
-        }
-
-        function visualizarOperacion(tipo, a, b, resultado) {
-            const xValues = [];
-            const yValues = [];
-            let titulo = '';
-
-            if (tipo === 'suma') {
-                titulo = `Suma: ${a} + ${b} = ${resultado}`;
-                
-                for (let i = 0; i <= 100; i++) {
-                    xValues.push(i / 100);
-                    yValues.push(0);
-                }
-                
-                for (let i = 100; i <= 200; i++) {
-                    xValues.push(i / 100);
-                    yValues.push(a);
-                }
-                
-                for (let i = 200; i <= 300; i++) {
-                    xValues.push(i / 100);
-                    yValues.push(resultado);
-                }
-                
-            } else if (tipo === 'resta') {
-                titulo = `Resta: ${a} - ${b} = ${resultado}`;
-                
-                for (let i = 0; i <= 100; i++) {
-                    xValues.push(i / 100);
-                    yValues.push(0);
-                }
-                
-                for (let i = 100; i <= 200; i++) {
-                    xValues.push(i / 100);
-                    yValues.push(a);
-                }
-                
-                for (let i = 200; i <= 300; i++) {
-                    xValues.push(i / 100);
-                    yValues.push(resultado);
-                }
-                
-            } else if (tipo === 'multiplicar') {
-                titulo = `Multiplicación: ${a} × ${b} = ${resultado}`;
-                
-                for (let i = 0; i <= 100; i++) {
-                    xValues.push(i / 100);
-                    yValues.push(0);
-                }
-                
-                for (let i = 100; i <= 300; i++) {
-                    const progress = (i - 100) / 200;
-                    xValues.push(i / 100);
-                    yValues.push(progress * resultado);
-                }
-                
-            } else if (tipo === 'dividir') {
-                titulo = `División: ${a} ÷ ${b} = ${resultado}`;
-                
-                for (let i = 0; i <= 100; i++) {
-                    xValues.push(i / 100);
-                    yValues.push(a);
-                }
-                
-                for (let i = 100; i <= 300; i++) {
-                    const progress = (i - 100) / 200;
-                    xValues.push(i / 100);
-                    yValues.push(a - (a - resultado) * progress);
-                }
-            }
-
-            chart.data.labels = xValues;
-            chart.data.datasets[0].data = yValues;
-            chart.data.datasets[0].label = titulo;
-            
-            const colores = {
-                'suma': { border: 'rgb(17, 153, 142)', bg: 'rgba(17, 153, 142, 0.2)' },
-                'resta': { border: 'rgb(240, 147, 251)', bg: 'rgba(240, 147, 251, 0.2)' },
-                'multiplicar': { border: 'rgb(79, 172, 254)', bg: 'rgba(79, 172, 254, 0.2)' },
-                'dividir': { border: 'rgb(250, 112, 154)', bg: 'rgba(250, 112, 154, 0.2)' }
-            };
-            
-            chart.data.datasets[0].borderColor = colores[tipo].border;
-            chart.data.datasets[0].backgroundColor = colores[tipo].bg;
-            chart.data.datasets[0].fill = true;
-            chart.data.datasets[0].borderWidth = 4;
-            
-            chart.update('active');
-        }
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key >= '0' && e.key <= '9') {
-                agregarDigito(e.key);
-            } else if (e.key === '.') {
-                agregarDigito('.');
-            } else if (e.key === 'Backspace') {
-                borrarDigito();
-            } else if (e.key === 'Enter') {
-                if (operacion !== null && primerNumero !== null) {
-                    calcular();
-                }
-            } else if (e.key === 'Escape') {
-                limpiar();
-            } else if (e.key === '+') {
-                setOperacion('suma');
-            } else if (e.key === '-') {
-                setOperacion('resta');
-            } else if (e.key === '*') {
-                setOperacion('multiplicar');
-            } else if (e.key === '/') {
-                e.preventDefault();
-                setOperacion('dividir');
-            }
-        });
-
-        document.getElementById('funcionInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                graficarFuncion();
-            }
-        });
-
-        actualizarDisplay();
-        inicializarGrafica();
-        graficarEjemplo('sin(x)');
-    </script>
-</body>
-</html>
+/* === Test automático === */
+function testOperaciones(){
+  const pruebas=[{a:5,op:'s
