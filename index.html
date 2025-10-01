@@ -290,19 +290,34 @@
             margin-top: 10px;
         }
 
+        .ejemplo-item {
+            display: inline-block;
+            margin: 4px 2px;
+        }
+
+        .ejemplo-titulo {
+            font-size: 10px;
+            color: #667eea;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 2px;
+        }
+
         .ejemplos span {
             display: inline-block;
             background: #f0f0f0;
-            padding: 4px 8px;
+            padding: 6px 10px;
             border-radius: 5px;
-            margin: 2px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: all 0.3s;
+            font-weight: 500;
         }
 
         .ejemplos span:hover {
             background: #667eea;
             color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(102, 126, 234, 0.3);
         }
 
         .historial {
@@ -475,15 +490,39 @@
                     <button class="boton-graficar" onclick="graficarFuncion()">Graficar</button>
                 </div>
                 <div class="ejemplos">
-                    <strong>Ejemplos:</strong>
-                    <span onclick="graficarEjemplo('sin(x)')">sin(x)</span>
-                    <span onclick="graficarEjemplo('cos(x)')">cos(x)</span>
-                    <span onclick="graficarEjemplo('x^2')">x²</span>
-                    <span onclick="graficarEjemplo('x^3 - 2*x')">x³-2x</span>
-                    <span onclick="graficarEjemplo('log10(x)')">log(x)</span>
-                    <span onclick="graficarEjemplo('sqrt(x)')">√x</span>
-                    <span onclick="graficarEjemplo('abs(x)')">|x|</span>
-                    <span onclick="graficarEjemplo('exp(x)')">eˣ</span>
+                    <strong>Ejemplos de funciones:</strong><br>
+                    <div class="ejemplo-item">
+                        <span class="ejemplo-titulo">Función Seno</span>
+                        <span onclick="graficarEjemplo('sin(x)')">sin(x)</span>
+                    </div>
+                    <div class="ejemplo-item">
+                        <span class="ejemplo-titulo">Función Coseno</span>
+                        <span onclick="graficarEjemplo('cos(x)')">cos(x)</span>
+                    </div>
+                    <div class="ejemplo-item">
+                        <span class="ejemplo-titulo">Parábola</span>
+                        <span onclick="graficarEjemplo('x^2')">x²</span>
+                    </div>
+                    <div class="ejemplo-item">
+                        <span class="ejemplo-titulo">Cúbica</span>
+                        <span onclick="graficarEjemplo('x^3 - 2*x')">x³-2x</span>
+                    </div>
+                    <div class="ejemplo-item">
+                        <span class="ejemplo-titulo">Logaritmo</span>
+                        <span onclick="graficarEjemplo('log10(x)')">log(x)</span>
+                    </div>
+                    <div class="ejemplo-item">
+                        <span class="ejemplo-titulo">Raíz Cuadrada</span>
+                        <span onclick="graficarEjemplo('sqrt(x)')">√x</span>
+                    </div>
+                    <div class="ejemplo-item">
+                        <span class="ejemplo-titulo">Valor Absoluto</span>
+                        <span onclick="graficarEjemplo('abs(x)')">|x|</span>
+                    </div>
+                    <div class="ejemplo-item">
+                        <span class="ejemplo-titulo">Exponencial</span>
+                        <span onclick="graficarEjemplo('exp(x)')">eˣ</span>
+                    </div>
                 </div>
             </div>
             <div class="canvas-container">
