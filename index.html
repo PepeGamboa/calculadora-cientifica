@@ -73,7 +73,7 @@
             padding: 20px;
             border-radius: 15px;
             margin-bottom: 20px;
-            min-height: 60px;
+            min-height: 80px;
             font-size: 24px;
             text-align: right;
             word-wrap: break-word;
@@ -84,6 +84,44 @@
             font-size: 14px;
             opacity: 0.8;
             margin-bottom: 5px;
+            min-height: 20px;
+        }
+
+        .input-numeros {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .btn-numero {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .btn-numero:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-numero:active {
+            transform: translateY(0);
+        }
+
+        .btn-punto {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+        }
+
+        .btn-borrar {
+            background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+            color: white;
         }
 
         .botones {
@@ -329,54 +367,70 @@
                 <div id="display">0</div>
             </div>
 
+            <!-- Teclado numérico -->
+            <div class="input-numeros">
+                <button class="btn-numero" onclick="agregarDigito('7')">7</button>
+                <button class="btn-numero" onclick="agregarDigito('8')">8</button>
+                <button class="btn-numero" onclick="agregarDigito('9')">9</button>
+                <button class="btn-numero" onclick="agregarDigito('4')">4</button>
+                <button class="btn-numero" onclick="agregarDigito('5')">5</button>
+                <button class="btn-numero" onclick="agregarDigito('6')">6</button>
+                <button class="btn-numero" onclick="agregarDigito('1')">1</button>
+                <button class="btn-numero" onclick="agregarDigito('2')">2</button>
+                <button class="btn-numero" onclick="agregarDigito('3')">3</button>
+                <button class="btn-numero" onclick="agregarDigito('0')">0</button>
+                <button class="btn-numero btn-punto" onclick="agregarDigito('.')">.</button>
+                <button class="btn-numero btn-borrar" onclick="borrarDigito()">⌫</button>
+            </div>
+
             <div class="botones">
                 <button class="boton suma" onclick="setOperacion('suma')">+ Suma</button>
                 <button class="boton resta" onclick="setOperacion('resta')">- Resta</button>
                 <button class="boton multiplicar" onclick="setOperacion('multiplicar')">× Multiplicar</button>
-                <button class="boton dividir" onclick="setOperacion('dividir')">/ Dividir</button>
+                <button class="boton dividir" onclick="setOperacion('dividir')">÷ Dividir</button>
             </div>
 
-            <button class="boton limpiar" onclick="limpiar()" style="width: 100%;">Limpiar</button>
+            <button class="boton limpiar" onclick="limpiar()" style="width: 100%;">Limpiar Todo</button>
 
             <div class="seccion">
                 <div class="seccion-titulo">⚡ OPERACIONES AVANZADAS:</div>
                 <div class="botones-avanzados">
-                    <button class="boton-avanzado modulo" onclick="setOperacion('modulo')">5. Módulo (resto)</button>
-                    <button class="boton-avanzado potencia" onclick="setOperacion('potencia')">6. Potencia (a^b)</button>
-                    <button class="boton-avanzado raiz" onclick="operacionUnaria('raiz')">7. Raíz cuadrada</button>
-                    <button class="boton-avanzado raiz-n" onclick="operacionUnaria('raizN')">8. Raíz n-ésima</button>
-                    <button class="boton-avanzado logaritmo" onclick="operacionUnaria('log10')">9. Logaritmo (base 10)</button>
-                    <button class="boton-avanzado ln" onclick="operacionUnaria('ln')">10. Logaritmo natural (ln)</button>
-                    <button class="boton-avanzado log-custom" onclick="setOperacion('logCustom')">11. Log (base personalizada)</button>
+                    <button class="boton-avanzado modulo" onclick="setOperacion('modulo')">Módulo (resto)</button>
+                    <button class="boton-avanzado potencia" onclick="setOperacion('potencia')">Potencia (a^b)</button>
+                    <button class="boton-avanzado raiz" onclick="operacionUnaria('raiz')">Raíz cuadrada</button>
+                    <button class="boton-avanzado raiz-n" onclick="operacionUnaria('raizN')">Raíz n-ésima</button>
+                    <button class="boton-avanzado logaritmo" onclick="operacionUnaria('log10')">Logaritmo (base 10)</button>
+                    <button class="boton-avanzado ln" onclick="operacionUnaria('ln')">Logaritmo natural (ln)</button>
+                    <button class="boton-avanzado log-custom" onclick="setOperacion('logCustom')">Log (base personalizada)</button>
                 </div>
             </div>
 
             <div class="seccion">
                 <div class="seccion-titulo">📐 FUNCIONES TRIGONOMÉTRICAS:</div>
                 <div class="botones-avanzados">
-                    <button class="boton-avanzado seno" onclick="operacionUnaria('seno')">12. Seno</button>
-                    <button class="boton-avanzado coseno" onclick="operacionUnaria('coseno')">13. Coseno</button>
-                    <button class="boton-avanzado tangente" onclick="operacionUnaria('tangente')">14. Tangente</button>
-                    <button class="boton-avanzado arcoseno" onclick="operacionUnaria('arcoseno')">15. Arcoseno</button>
-                    <button class="boton-avanzado arcocoseno" onclick="operacionUnaria('arcocoseno')">16. Arcocoseno</button>
-                    <button class="boton-avanzado arcotangente" onclick="operacionUnaria('arcotangente')">17. Arcotangente</button>
+                    <button class="boton-avanzado seno" onclick="operacionUnaria('seno')">Seno</button>
+                    <button class="boton-avanzado coseno" onclick="operacionUnaria('coseno')">Coseno</button>
+                    <button class="boton-avanzado tangente" onclick="operacionUnaria('tangente')">Tangente</button>
+                    <button class="boton-avanzado arcoseno" onclick="operacionUnaria('arcoseno')">Arcoseno</button>
+                    <button class="boton-avanzado arcocoseno" onclick="operacionUnaria('arcocoseno')">Arcocoseno</button>
+                    <button class="boton-avanzado arcotangente" onclick="operacionUnaria('arcotangente')">Arcotangente</button>
                 </div>
             </div>
 
             <div class="seccion">
                 <div class="seccion-titulo">🎯 OTRAS FUNCIONES:</div>
                 <div class="botones-avanzados">
-                    <button class="boton-avanzado factorial" onclick="operacionUnaria('factorial')">18. Factorial</button>
-                    <button class="boton-avanzado absoluto" onclick="operacionUnaria('absoluto')">19. Valor absoluto</button>
-                    <button class="boton-avanzado redondeo" onclick="operacionUnaria('redondeo')">20. Redondeo</button>
+                    <button class="boton-avanzado factorial" onclick="operacionUnaria('factorial')">Factorial</button>
+                    <button class="boton-avanzado absoluto" onclick="operacionUnaria('absoluto')">Valor absoluto</button>
+                    <button class="boton-avanzado redondeo" onclick="operacionUnaria('redondeo')">Redondeo</button>
                 </div>
             </div>
 
             <div class="seccion">
                 <div class="seccion-titulo">⭐ CONSTANTES:</div>
                 <div class="botones-avanzados">
-                    <button class="boton-avanzado pi" onclick="insertarConstante('pi')">21. Mostrar π (pi)</button>
-                    <button class="boton-avanzado euler" onclick="insertarConstante('e')">22. Mostrar e (Euler)</button>
+                    <button class="boton-avanzado pi" onclick="insertarConstante('pi')">Mostrar π (pi)</button>
+                    <button class="boton-avanzado euler" onclick="insertarConstante('e')">Mostrar e (Euler)</button>
                 </div>
             </div>
 
@@ -405,7 +459,7 @@
                     <span onclick="graficarEjemplo('cos(x)')">cos(x)</span>
                     <span onclick="graficarEjemplo('x^2')">x²</span>
                     <span onclick="graficarEjemplo('x^3 - 2*x')">x³-2x</span>
-                    <span onclick="graficarEjemplo('log(x)')">log(x)</span>
+                    <span onclick="graficarEjemplo('log10(x)')">log(x)</span>
                     <span onclick="graficarEjemplo('sqrt(x)')">√x</span>
                     <span onclick="graficarEjemplo('abs(x)')">|x|</span>
                     <span onclick="graficarEjemplo('exp(x)')">eˣ</span>
@@ -423,6 +477,7 @@
         let primerNumero = null;
         let historialArray = [];
         let chart = null;
+        let nuevoNumero = true;
 
         function actualizarDisplay() {
             document.getElementById('display').textContent = valorActual;
@@ -443,21 +498,40 @@
             }
         }
 
+        function agregarDigito(digito) {
+            if (nuevoNumero) {
+                valorActual = digito === '.' ? '0.' : digito;
+                nuevoNumero = false;
+            } else {
+                if (digito === '.' && valorActual.includes('.')) return;
+                valorActual = valorActual === '0' && digito !== '.' ? digito : valorActual + digito;
+            }
+            actualizarDisplay();
+        }
+
+        function borrarDigito() {
+            if (valorActual.length > 1) {
+                valorActual = valorActual.slice(0, -1);
+            } else {
+                valorActual = '0';
+            }
+            actualizarDisplay();
+        }
+
         function setOperacion(op) {
-            if (valorActual === '0' || valorActual === '') {
-                alert('Por favor ingresa un número primero');
+            if (valorActual === '' || valorActual === '.') {
+                alert('Por favor ingresa un número válido primero');
                 return;
             }
-            primerNumero = parseFloat(valorActual);
-            operacion = op;
-            valorActual = '0';
-            actualizarDisplay();
-            
-            let segundo = prompt('Ingresa el segundo número:');
-            if (segundo !== null && segundo !== '') {
-                valorActual = segundo;
+
+            if (primerNumero !== null && operacion !== null && !nuevoNumero) {
                 calcular();
             }
+
+            primerNumero = parseFloat(valorActual);
+            operacion = op;
+            nuevoNumero = true;
+            actualizarDisplay();
         }
 
         function calcular() {
@@ -495,17 +569,21 @@
                         operacionTexto = `${primerNumero} mod ${segundoNumero}`;
                         break;
                     case 'logCustom':
+                        if (primerNumero <= 0 || segundoNumero <= 0) {
+                            throw new Error('Logaritmo solo para números positivos');
+                        }
                         resultado = Math.log(primerNumero) / Math.log(segundoNumero);
                         operacionTexto = `log${segundoNumero}(${primerNumero})`;
                         break;
                 }
 
-                valorActual = resultado.toString();
-                agregarHistorial(`${operacionTexto} = ${resultado}`);
+                valorActual = resultado.toFixed(10).replace(/\.?0+$/, '');
+                agregarHistorial(`${operacionTexto} = ${valorActual}`);
                 actualizarDisplay();
                 
                 primerNumero = null;
                 operacion = null;
+                nuevoNumero = true;
             } catch(error) {
                 alert(error.message);
                 limpiar();
@@ -513,10 +591,12 @@
         }
 
         function operacionUnaria(tipo) {
-            let numero = prompt('Ingresa el número:');
-            if (numero === null || numero === '') return;
+            let numero = parseFloat(valorActual);
+            if (isNaN(numero)) {
+                alert('Por favor ingresa un número válido');
+                return;
+            }
             
-            numero = parseFloat(numero);
             let resultado;
             let operacionTexto = '';
 
@@ -531,6 +611,7 @@
                         let n = prompt('¿Raíz de qué grado?');
                         if (n === null || n === '') return;
                         n = parseFloat(n);
+                        if (isNaN(n)) throw new Error('Grado de raíz inválido');
                         resultado = Math.pow(numero, 1/n);
                         operacionTexto = `${n}√${numero}`;
                         break;
@@ -572,6 +653,7 @@
                         break;
                     case 'factorial':
                         if (numero < 0 || numero % 1 !== 0) throw new Error('Factorial solo para enteros positivos');
+                        if (numero > 170) throw new Error('Número demasiado grande para factorial');
                         resultado = factorial(numero);
                         operacionTexto = `${numero}!`;
                         break;
@@ -585,8 +667,9 @@
                         break;
                 }
 
-                valorActual = resultado.toString();
-                agregarHistorial(`${operacionTexto} = ${resultado}`);
+                valorActual = resultado.toFixed(10).replace(/\.?0+$/, '');
+                agregarHistorial(`${operacionTexto} = ${valorActual}`);
+                nuevoNumero = true;
                 actualizarDisplay();
             } catch(error) {
                 alert(error.message);
@@ -604,12 +687,13 @@
 
         function insertarConstante(tipo) {
             if (tipo === 'pi') {
-                valorActual = Math.PI.toString();
-                agregarHistorial(`π = ${Math.PI}`);
+                valorActual = Math.PI.toFixed(10).replace(/\.?0+$/, '');
+                agregarHistorial(`π = ${valorActual}`);
             } else if (tipo === 'e') {
-                valorActual = Math.E.toString();
-                agregarHistorial(`e = ${Math.E}`);
+                valorActual = Math.E.toFixed(10).replace(/\.?0+$/, '');
+                agregarHistorial(`e = ${valorActual}`);
             }
+            nuevoNumero = true;
             actualizarDisplay();
         }
 
@@ -617,6 +701,7 @@
             valorActual = '0';
             operacion = null;
             primerNumero = null;
+            nuevoNumero = true;
             actualizarDisplay();
         }
 
@@ -656,6 +741,10 @@
                             labels: {
                                 font: { size: 14 }
                             }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
                         }
                     },
                     scales: {
@@ -663,7 +752,7 @@
                             title: {
                                 display: true,
                                 text: 'x',
-                                font: { size: 16 }
+                                font: { size: 16, weight: 'bold' }
                             },
                             grid: {
                                 color: 'rgba(0, 0, 0, 0.1)'
@@ -673,39 +762,46 @@
                             title: {
                                 display: true,
                                 text: 'f(x)',
-                                font: { size: 16 }
+                                font: { size: 16, weight: 'bold' }
                             },
                             grid: {
                                 color: 'rgba(0, 0, 0, 0.1)'
                             }
                         }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
                     }
                 }
             });
         }
 
         function graficarFuncion() {
-            let funcion = document.getElementById('funcionInput').value;
+            let funcion = document.getElementById('funcionInput').value.trim();
             if (!funcion) {
                 alert('Por favor escribe una función');
                 return;
             }
 
             try {
-                // Convertir la función a sintaxis de Math.js
-                funcion = funcion.replace(/\^/g, '^');
-                funcion = funcion.replace(/log/g, 'log10');
+                // Preparar la función para math.js
+                let funcionProcesada = funcion
+                    .replace(/\^/g, '^')
+                    .replace(/log\(/g, 'log10(');
                 
                 const xValues = [];
                 const yValues = [];
-                const paso = 0.1;
-                const rango = 20;
+                const paso = 0.05;
+                const rango = 10;
 
+                // Generar puntos
                 for (let x = -rango; x <= rango; x += paso) {
                     try {
-                        const y = math.evaluate(funcion, { x: x });
-                        if (isFinite(y) && !isNaN(y)) {
-                            xValues.push(x.toFixed(2));
+                        const y = math.evaluate(funcionProcesada, { x: x });
+                        if (isFinite(y) && !isNaN(y) && Math.abs(y) < 1e6) {
+                            xValues.push(parseFloat(x.toFixed(2)));
                             yValues.push(y);
                         }
                     } catch(e) {
@@ -714,17 +810,18 @@
                 }
 
                 if (xValues.length === 0) {
-                    throw new Error('No se pudieron generar puntos válidos');
+                    throw new Error('No se pudieron generar puntos válidos para esta función');
                 }
 
+                // Actualizar gráfica
                 chart.data.labels = xValues;
                 chart.data.datasets[0].data = yValues;
-                chart.data.datasets[0].label = `f(x) = ${document.getElementById('funcionInput').value}`;
+                chart.data.datasets[0].label = `f(x) = ${funcion}`;
                 chart.update();
                 
-                agregarHistorial(`Graficada: ${document.getElementById('funcionInput').value}`);
+                agregarHistorial(`Graficada: ${funcion}`);
             } catch(error) {
-                alert('Error al graficar: ' + error.message + '\n\nVerifica la sintaxis de tu función');
+                alert('Error al graficar la función:\n' + error.message + '\n\nVerifica la sintaxis. Ejemplos:\n- sin(x), cos(x), tan(x)\n- x^2, x^3\n- log10(x), log(x)\n- sqrt(x)\n- abs(x)\n- exp(x)');
             }
         }
 
@@ -732,6 +829,39 @@
             document.getElementById('funcionInput').value = funcion;
             graficarFuncion();
         }
+
+        // Soporte para teclas
+        document.addEventListener('keydown', function(e) {
+            if (e.key >= '0' && e.key <= '9') {
+                agregarDigito(e.key);
+            } else if (e.key === '.') {
+                agregarDigito('.');
+            } else if (e.key === 'Backspace') {
+                borrarDigito();
+            } else if (e.key === 'Enter') {
+                if (operacion !== null && primerNumero !== null) {
+                    calcular();
+                }
+            } else if (e.key === 'Escape') {
+                limpiar();
+            } else if (e.key === '+') {
+                setOperacion('suma');
+            } else if (e.key === '-') {
+                setOperacion('resta');
+            } else if (e.key === '*') {
+                setOperacion('multiplicar');
+            } else if (e.key === '/') {
+                e.preventDefault();
+                setOperacion('dividir');
+            }
+        });
+
+        // Permitir Enter en el input de funciones
+        document.getElementById('funcionInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                graficarFuncion();
+            }
+        });
 
         // Inicializar
         actualizarDisplay();
