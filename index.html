@@ -68,16 +68,32 @@
         }
 
         .display {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 20px;
-            border-radius: 15px;
+            border-radius: 20px;
             margin-bottom: 20px;
             min-height: 80px;
             font-size: 24px;
             text-align: right;
             word-wrap: break-word;
-            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 
+                0 8px 20px rgba(102, 126, 234, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+            border-radius: 20px 20px 0 0;
         }
 
         .operacion-actual {
@@ -95,35 +111,64 @@
         }
 
         .btn-numero {
-            padding: 15px;
+            padding: 18px;
             border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 600;
+            border-radius: 18px;
+            font-size: 20px;
+            font-weight: 700;
             cursor: pointer;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(145deg, #ffffff 0%, #e8ecf1 100%);
             color: #333;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), inset 0 -2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            box-shadow: 
+                0 6px 15px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-numero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, transparent 100%);
+            border-radius: 18px 18px 0 0;
         }
 
         .btn-numero:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 10px 25px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.15);
         }
 
         .btn-numero:active {
             transform: translateY(1px);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            box-shadow: 
+                0 3px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 3px rgba(0, 0, 0, 0.3);
         }
 
         .btn-punto {
-            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            background: linear-gradient(145deg, #ffeb9a 0%, #fdc765 100%);
+            box-shadow: 
+                0 6px 15px rgba(253, 199, 101, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.15);
         }
 
         .btn-borrar {
-            background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+            background: linear-gradient(145deg, #ff7675 0%, #d63031 100%);
             color: white;
+            box-shadow: 
+                0 6px 15px rgba(214, 48, 49, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
         }
 
         .botones {
@@ -134,40 +179,97 @@
         }
 
         .boton {
-            padding: 15px;
+            padding: 18px;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 18px;
+            font-size: 17px;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             color: white;
-            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2), inset 0 -2px 8px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 6px 18px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        .boton::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, transparent 100%);
+            border-radius: 18px 18px 0 0;
         }
 
         .boton:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 -2px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 10px 28px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
         }
 
         .boton:active {
             transform: translateY(1px);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(0, 0, 0, 0.2);
+            box-shadow: 
+                0 3px 10px rgba(0, 0, 0, 0.25),
+                inset 0 1px 3px rgba(0, 0, 0, 0.3);
         }
 
-        .suma { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
-        .resta { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .multiplicar { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-        .dividir { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .suma { 
+            background: linear-gradient(145deg, #11998e 0%, #38ef7d 100%);
+            box-shadow: 
+                0 6px 18px rgba(56, 239, 125, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+        }
+        .resta { 
+            background: linear-gradient(145deg, #f093fb 0%, #f5576c 100%);
+            box-shadow: 
+                0 6px 18px rgba(245, 87, 108, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+        }
+        .multiplicar { 
+            background: linear-gradient(145deg, #4facfe 0%, #00f2fe 100%);
+            box-shadow: 
+                0 6px 18px rgba(0, 242, 254, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+        }
+        .dividir { 
+            background: linear-gradient(145deg, #fa709a 0%, #fee140 100%);
+            box-shadow: 
+                0 6px 18px rgba(254, 225, 64, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+        }
         .calcular { 
-            background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
-            box-shadow: 0 6px 15px rgba(0, 114, 255, 0.4), inset 0 -3px 10px rgba(0, 0, 0, 0.2);
-            font-size: 18px;
+            background: linear-gradient(145deg, #00c6ff 0%, #0072ff 100%);
+            box-shadow: 
+                0 8px 22px rgba(0, 114, 255, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -4px 0 rgba(0, 0, 0, 0.25);
+            font-size: 19px;
         }
         .calcular:hover {
-            box-shadow: 0 10px 25px rgba(0, 114, 255, 0.5), inset 0 -3px 10px rgba(0, 0, 0, 0.2);
+            box-shadow: 
+                0 12px 30px rgba(0, 114, 255, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -4px 0 rgba(0, 0, 0, 0.25);
         }
-        .limpiar { background: linear-gradient(135deg, #a8a8a8 0%, #7f7f7f 100%); }
+        .limpiar { 
+            background: linear-gradient(145deg, #a8a8a8 0%, #7f7f7f 100%);
+            box-shadow: 
+                0 6px 18px rgba(127, 127, 127, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+        }
 
         .seccion {
             margin-top: 20px;
@@ -190,25 +292,46 @@
         }
 
         .boton-avanzado {
-            padding: 12px;
+            padding: 14px;
             border: none;
-            border-radius: 8px;
+            border-radius: 16px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             color: white;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2), inset 0 -2px 6px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 5px 15px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+        }
+        
+        .boton-avanzado::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, transparent 100%);
+            border-radius: 16px 16px 0 0;
         }
 
         .boton-avanzado:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 7px 18px rgba(0, 0, 0, 0.3), inset 0 -2px 6px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 22px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.2);
         }
 
         .boton-avanzado:active {
             transform: translateY(1px);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(0, 0, 0, 0.2);
+            box-shadow: 
+                0 2px 8px rgba(0, 0, 0, 0.25),
+                inset 0 1px 3px rgba(0, 0, 0, 0.3);
         }
 
         .modulo { background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); }
@@ -388,7 +511,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- Panel Calculadora -->
         <div class="calculadora-panel">
             <div class="header">
                 <h1>🧮 Calculadora</h1>
@@ -400,7 +522,6 @@
                 <div id="display">0</div>
             </div>
 
-            <!-- Teclado numérico -->
             <div class="input-numeros">
                 <button class="btn-numero" onclick="agregarDigito('7')">7</button>
                 <button class="btn-numero" onclick="agregarDigito('8')">8</button>
@@ -481,7 +602,6 @@
             </div>
         </div>
 
-        <!-- Panel Gráficas -->
         <div class="grafica-panel">
             <div class="grafica-header">
                 <h2>📊 Visualización Gráfica</h2>
@@ -606,19 +726,23 @@
                     case 'suma':
                         resultado = primerNumero + segundoNumero;
                         operacionTexto = `${primerNumero} + ${segundoNumero}`;
+                        visualizarOperacion('suma', primerNumero, segundoNumero, resultado);
                         break;
                     case 'resta':
                         resultado = primerNumero - segundoNumero;
                         operacionTexto = `${primerNumero} - ${segundoNumero}`;
+                        visualizarOperacion('resta', primerNumero, segundoNumero, resultado);
                         break;
                     case 'multiplicar':
                         resultado = primerNumero * segundoNumero;
                         operacionTexto = `${primerNumero} × ${segundoNumero}`;
+                        visualizarOperacion('multiplicar', primerNumero, segundoNumero, resultado);
                         break;
                     case 'dividir':
                         if (segundoNumero === 0) throw new Error('No se puede dividir por cero');
                         resultado = primerNumero / segundoNumero;
                         operacionTexto = `${primerNumero} ÷ ${segundoNumero}`;
+                        visualizarOperacion('dividir', primerNumero, segundoNumero, resultado);
                         break;
                     case 'potencia':
                         resultado = Math.pow(primerNumero, segundoNumero);
@@ -775,7 +899,6 @@
             ).join('');
         }
 
-        // FUNCIONES DE GRÁFICAS
         function inicializarGrafica() {
             const ctx = document.getElementById('grafica').getContext('2d');
             chart = new Chart(ctx, {
@@ -846,7 +969,6 @@
             }
 
             try {
-                // Preparar la función para math.js
                 let funcionProcesada = funcion
                     .replace(/\^/g, '^')
                     .replace(/log\(/g, 'log10(');
@@ -856,7 +978,6 @@
                 const paso = 0.05;
                 const rango = 10;
 
-                // Generar puntos
                 for (let x = -rango; x <= rango; x += paso) {
                     try {
                         const y = math.evaluate(funcionProcesada, { x: x });
@@ -873,10 +994,13 @@
                     throw new Error('No se pudieron generar puntos válidos para esta función');
                 }
 
-                // Actualizar gráfica
                 chart.data.labels = xValues;
                 chart.data.datasets[0].data = yValues;
                 chart.data.datasets[0].label = `f(x) = ${funcion}`;
+                chart.data.datasets[0].borderColor = 'rgb(102, 126, 234)';
+                chart.data.datasets[0].backgroundColor = 'rgba(102, 126, 234, 0.1)';
+                chart.data.datasets[0].fill = false;
+                chart.data.datasets[0].borderWidth = 3;
                 chart.update();
                 
                 agregarHistorial(`Graficada: ${funcion}`);
@@ -890,7 +1014,95 @@
             graficarFuncion();
         }
 
-        // Soporte para teclas
+        function visualizarOperacion(tipo, a, b, resultado) {
+            const xValues = [];
+            const yValues = [];
+            let titulo = '';
+
+            if (tipo === 'suma') {
+                titulo = `Suma: ${a} + ${b} = ${resultado}`;
+                
+                for (let i = 0; i <= 100; i++) {
+                    xValues.push(i / 100);
+                    yValues.push(0);
+                }
+                
+                for (let i = 100; i <= 200; i++) {
+                    xValues.push(i / 100);
+                    yValues.push(a);
+                }
+                
+                for (let i = 200; i <= 300; i++) {
+                    xValues.push(i / 100);
+                    yValues.push(resultado);
+                }
+                
+            } else if (tipo === 'resta') {
+                titulo = `Resta: ${a} - ${b} = ${resultado}`;
+                
+                for (let i = 0; i <= 100; i++) {
+                    xValues.push(i / 100);
+                    yValues.push(0);
+                }
+                
+                for (let i = 100; i <= 200; i++) {
+                    xValues.push(i / 100);
+                    yValues.push(a);
+                }
+                
+                for (let i = 200; i <= 300; i++) {
+                    xValues.push(i / 100);
+                    yValues.push(resultado);
+                }
+                
+            } else if (tipo === 'multiplicar') {
+                titulo = `Multiplicación: ${a} × ${b} = ${resultado}`;
+                
+                for (let i = 0; i <= 100; i++) {
+                    xValues.push(i / 100);
+                    yValues.push(0);
+                }
+                
+                for (let i = 100; i <= 300; i++) {
+                    const progress = (i - 100) / 200;
+                    xValues.push(i / 100);
+                    yValues.push(progress * resultado);
+                }
+                
+            } else if (tipo === 'dividir') {
+                titulo = `División: ${a} ÷ ${b} = ${resultado}`;
+                
+                for (let i = 0; i <= 100; i++) {
+                    xValues.push(i / 100);
+                    yValues.push(a);
+                }
+                
+                for (let i = 100; i <= 300; i++) {
+                    const progress = (i - 100) / 200;
+                    xValues.push(i / 100);
+                    yValues.push(a - (a - resultado) * progress);
+                }
+            }
+
+            chart.data.labels = xValues;
+            chart.data.datasets[0].data = yValues;
+            chart.data.datasets[0].label = titulo;
+            
+            const colores = {
+                'suma': { border: 'rgb(17, 153, 142)', bg: 'rgba(17, 153, 142, 0.2)' },
+                'resta': { border: 'rgb(240, 147, 251)', bg: 'rgba(240, 147, 251, 0.2)' },
+                'multiplicar': { border: 'rgb(79, 172, 254)', bg: 'rgba(79, 172, 254, 0.2)' },
+                'dividir': { border: 'rgb(250, 112, 154)', bg: 'rgba(250, 112, 154, 0.2)' }
+            };
+            
+            chart.data.datasets[0].borderColor = colores[tipo].border;
+            chart.data.datasets[0].backgroundColor = colores[tipo].bg;
+            chart.data.datasets[0].fill = true;
+            chart.data.datasets[0].borderWidth = 4;
+            
+            chart.update('active');
+        }
+
         document.addEventListener('keydown', function(e) {
             if (e.key >= '0' && e.key <= '9') {
                 agregarDigito(e.key);
@@ -916,14 +1128,12 @@
             }
         });
 
-        // Permitir Enter en el input de funciones
         document.getElementById('funcionInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 graficarFuncion();
             }
         });
 
-        // Inicializar
         actualizarDisplay();
         inicializarGrafica();
         graficarEjemplo('sin(x)');
